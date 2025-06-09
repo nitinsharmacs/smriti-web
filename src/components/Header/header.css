@@ -10,7 +10,8 @@
 }
 
 .app-header > .searchbar {
-  flex-grow: 1;
+  flex-grow: 0.5;
+  margin-left: 5em;
 }
 
 @media screen and (max-width: 768px) {
@@ -22,6 +23,12 @@
   .app-header > .logo {
     display: none;
   }
+
+  .app-header > .searchbar {
+    flex-grow: 1;
+    margin: 0 0.5em;
+  }
+
   .app-header > .user-profile {
     display: none;
   }

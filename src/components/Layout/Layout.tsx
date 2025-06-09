@@ -1,23 +1,26 @@
-import { Container } from "@mui/material";
+import type { ReactElement } from 'react';
+import type { LayoutProps } from 'src/components/Layout/layout.types';
 
-import type { ReactElement } from "react";
-import type { LayoutProps } from "src/components/Layout/layout.types";
+import Header from 'src/components/Header/Header';
+import SideBar from 'src/components/Sidebar/Sidebar';
 
-import Header from "src/components/Header/Header";
-import SideBar from "src/components/Sidebar/Sidebar";
+import './layout.css';
+import Navigation from 'src/components/Navigation/Navigation';
+import StorageBar from 'src/components/StorageBar/StorageBar';
 
 const Layout = (props: LayoutProps): ReactElement => {
-  return <Container maxWidth={false} style={{padding: '0'}}>
-    <Header />
-    <div>
-      <SideBar>
-        <div>Sidebar</div>
-      </SideBar>
-      <div>
-        {props.children}
+  return (
+    <div className='page-layout'>
+      <Header />
+      <div className='page-container'>
+        <SideBar>
+          <Navigation />
+          <StorageBar />
+        </SideBar>
+        <div className='page-content'>{props.children}</div>
       </div>
     </div>
-  </Container>
+  );
 };
 
 export default Layout;

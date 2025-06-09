@@ -1,0 +1,24 @@
+.page-layout {
+  background-color: var(--secondary-bg-color);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-container {
+  display: flex;
+  flex-grow: 1;
+}
+
+.page-content {
+  background-color: var(--main-bg-color);
+  flex-grow: 1;
+  border-radius: 20px 0 0 0;
+}
+
+@media screen and (max-width: 768px) {
+  .page-container > .sidebar {
+    display: none;
+  }
+}

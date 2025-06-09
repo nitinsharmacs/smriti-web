@@ -1,0 +1,12 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  padding-left: 0;
+  background-color: var(--secondary-bg-color);
+}
+
+.sidebar > .storagebar {
+  margin-left: 20px;
+}

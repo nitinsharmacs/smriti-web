@@ -1,7 +1,5 @@
 const Photos = () => {
-  return <div>
-    photos
-  </div>
+  return <div>Phoytos</div>;
 };
 
 export default Photos;

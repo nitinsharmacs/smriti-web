@@ -11,8 +11,9 @@ const Upload = () => {
         variant='text'
         startIcon={<UploadIcon />}
         className='upload-btn-web'
+        sx={{ textTransform: 'inherit' }}
       >
-        Upload files
+        Upload
       </Button>
 
       <IconButton aria-label='upload' className='upload-btn-mob'>
