@@ -1,0 +1,15 @@
+.app-header {
+  background-color: #343a40;
+  display: flex;
+  padding: 1em 1.5em;
+  align-items: center;
+}
+
+.app-header > .upload  {
+  margin-left: auto;
+}
+
+.app-header > .searchbar {
+  flex-grow: 0.5;
+  margin-left: 10%;
+}
