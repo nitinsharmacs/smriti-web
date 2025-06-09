@@ -1,0 +1,12 @@
+.navigation {
+  color: var(--main-text-fg-color);
+  padding-right: 2em;
+}
+
+.navigation > ul > li {
+  margin: 0.5em 0;
+}
+
+.navigation-link {
+  border-radius: 0 100px 100px 0;
+}

@@ -1,0 +1,32 @@
+.navigator-mob-menu {
+  color: var(--main-text-fg-color);
+}
+
+.navigator-mob-slider {
+  width: 50%;
+}
+
+.MuiDrawer-paper {
+  background-color: var(--secondary-bg-color);
+  width: 80%;
+}
+
+.navigator-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1em 2em;
+}
+
+.navigator-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.navigator-content > .navigation {
+  flex-grow: 1;
+}
+
+.navigator-content > .storagebar {
+  margin: 20px;
+}

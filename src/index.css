@@ -1,29 +1,28 @@
 @font-face {
-  font-family: "Opun Mai";
-  src: url("./fonts/opun-mai/OpunMaiRegular.ttf") format("truetype");
+  font-family: 'Opun Mai';
+  src: url('./fonts/opun-mai/OpunMaiRegular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Opun Mai";
-  src: url("./fonts/opun-mai/OpunMaiBold.ttf") format("truetype");
+  font-family: 'Opun Mai';
+  src: url('./fonts/opun-mai/OpunMaiBold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Opun Mai";
-  src: url("./fonts/opun-mai/OpunMaiLight.ttf") format("truetype");
+  font-family: 'Opun Mai';
+  src: url('./fonts/opun-mai/OpunMaiLight.ttf') format('truetype');
   font-weight: 200;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  font-family: "Opun Mai";
   line-height: 1.5;
   font-weight: normal;
   font-size: 16px;
@@ -39,9 +38,17 @@
   --h1-fg-color: #fdfdfd;
   --main-text-fg-color: #e9ecef;
   --sub-text-fg-color: #adb5bd;
+
+  --main-bg-color: #212529;
+  --secondary-bg-color: #343a40;
+  --highlight-bg-color: #495057;
+  --menu-bg-color: #495057;
 }
 
 * {
   padding: 0;
   margin: 0;
+
+  color: var(--main-text-fg-color);
+  font-family: 'Opun Mai' !important;
 }

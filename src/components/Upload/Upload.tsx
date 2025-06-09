@@ -1,20 +1,25 @@
 import UploadIcon from '@mui/icons-material/Upload';
-import { Button } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 
-import "./upload.css";
+import './upload.css';
 
 const Upload = () => {
-  return <div className="upload">
-    <Button
-      component="label"
-      variant="text"
-      tabIndex={-1}
-      startIcon={<UploadIcon />}
-      className='upload-btn'
-    >
-      Upload files
-    </Button>
-  </div>
+  return (
+    <div className='upload'>
+      <Button
+        component='label'
+        variant='text'
+        startIcon={<UploadIcon />}
+        className='upload-btn-web'
+      >
+        Upload files
+      </Button>
+
+      <IconButton aria-label='upload' className='upload-btn-mob'>
+        <UploadIcon />
+      </IconButton>
+    </div>
+  );
 };
 
 export default Upload;

@@ -2,13 +2,14 @@ import './App.css';
 import Layout from './components/Layout/Layout';
 import Photos from './screens/Photos/Photos';
 
-
 function App() {
   return (
-    <Layout>
-      <Photos />
-    </Layout>
-  )
+    <div className='app'>
+      <Layout>
+        <Photos />
+      </Layout>
+    </div>
+  );
 }
 
-export default App
+export default App;

@@ -1,0 +1,12 @@
+.progressbar {
+  background-color: var(--sub-text-fg-color);
+}
+
+.progressbar,
+.progressbar > span {
+  border-radius: 20px;
+}
+
+.progressbar > span {
+  background-color: var(--secondary-bg-color);
+}

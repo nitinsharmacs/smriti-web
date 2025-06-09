@@ -1,6 +1,6 @@
 .searchbar {
   background-color: #495057;
-  padding: 0.8em 1.5em;
+  padding: 10px 20px;
   margin: 0 1em;
   border-radius: 20px;
 }
@@ -12,11 +12,18 @@
 }
 
 .searchbar-input > input {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #adb5bd;
   background-color: transparent;
   border: 0;
   outline: none;
   margin-left: 10px;
   width: 100%;
+  padding: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .searchbar {
+    padding: 5px 15px;
+  }
 }

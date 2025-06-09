@@ -1,4 +1,14 @@
-.upload-btn {
+.upload-btn-mob,
+.upload-btn-web {
   color: var(--main-text-fg-color);
+}
+
+.upload-btn-web {
   margin: 0 2em;
+}
+
+.upload-btn-mob {
+  display: none;
+  margin-left: auto;
+  font-size: 0;
 }

@@ -1,15 +1,42 @@
 .app-header {
-  background-color: #343a40;
+  background-color: var(--secondary-bg-color);
   display: flex;
   padding: 1em 1.5em;
   align-items: center;
 }
 
-.app-header > .upload  {
+.app-header > .upload {
   margin-left: auto;
 }
 
 .app-header > .searchbar {
-  flex-grow: 0.5;
-  margin-left: 10%;
+  flex-grow: 1;
+}
+
+@media screen and (max-width: 768px) {
+  .app-header {
+    padding: 0.5em 1em;
+    justify-content: space-between;
+  }
+
+  .app-header > .logo {
+    display: none;
+  }
+  .app-header > .user-profile {
+    display: none;
+  }
+
+  .app-header .upload-btn-web {
+    display: none;
+  }
+
+  .app-header .upload-btn-mob {
+    display: inline-block;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .app-header > .navigator-mob {
+    display: none;
+  }
 }

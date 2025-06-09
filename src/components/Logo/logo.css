@@ -2,3 +2,9 @@
   color: var(--h1-fg-color);
   font-size: 2.5rem;
 }
+
+@media screen and (max-width: 768px) {
+  .logo {
+    font-size: 2rem;
+  }
+}
