@@ -15,10 +15,15 @@
   background-color: var(--main-bg-color);
   flex-grow: 1;
   border-radius: 20px 0 0 0;
+  padding: 0.5em 0em;
 }
 
 @media screen and (max-width: 768px) {
   .page-container > .sidebar {
     display: none;
+  }
+
+  .page-content {
+    border-radius: 0;
   }
 }
