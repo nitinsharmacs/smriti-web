@@ -15,7 +15,7 @@
   background-color: var(--main-bg-color);
   flex-grow: 1;
   border-radius: 20px 0 0 0;
-  padding: 0.5em 0em;
+  padding: 0.5em 1em;
 }
 
 @media screen and (max-width: 768px) {

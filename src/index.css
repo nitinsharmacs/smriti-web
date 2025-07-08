@@ -23,7 +23,6 @@
 }
 
 :root {
-  line-height: 1.5;
   font-weight: normal;
   font-size: 16px;
   color-scheme: normal;
@@ -48,7 +47,6 @@
 * {
   padding: 0;
   margin: 0;
-
-  color: var(--main-text-fg-color);
   font-family: 'Opun Mai' !important;
+  user-select: none;
 }
