@@ -1,9 +1,9 @@
 .app-header {
   background-color: var(--secondary-bg-color);
   display: flex;
-  padding: 0.5em 1.5em;
+  padding: 0em 1.5em;
   align-items: center;
-  height: 50px;
+  height: 70px;
 }
 
 .app-header > .upload {
@@ -17,9 +17,9 @@
 
 @media screen and (max-width: 768px) {
   .app-header {
-    padding: 0.5em 1em;
+    padding: 0em 1em;
     justify-content: space-between;
-    height: 45px;
+    height: 65px;
   }
 
   .app-header > .logo {
