@@ -6,14 +6,18 @@ import type {
   SectionType,
 } from 'scrubbable-photo-grid/dist/types';
 
-import { useCallback, useRef, useState } from 'react';
+import { createRef, useCallback, useRef, useState } from 'react';
 import images from '../../../data/images.json';
 import type { SelectBarControl } from 'src/components/SelectBar/types';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 import SelectBar from 'src/components/SelectBar/SelectBar';
-import type { GridSelectionHandler } from 'scrubbable-photo-grid/dist/Grid/types';
+import type {
+  GridOps,
+  GridSelectionHandler,
+} from 'scrubbable-photo-grid/dist/Grid/types';
+import type { GridSelections } from 'scrubbable-photo-grid/dist/models/GridSelector';
 
 const gridData = images.slice(0, 10) as SectionType[];
 
@@ -22,6 +26,12 @@ const gridConfig: GridConfigType = {
   targetRowHeight: 150,
   segmentMargin: 5,
   sectionMargin: 10,
+};
+
+export const getSelectionCount = (selections: GridSelections): number => {
+  return Object.values(selections).flatMap((segments) =>
+    Object.values(segments).flatMap((seg) => seg)
+  ).length;
 };
 
 const Photos = () => {
@@ -40,30 +50,31 @@ const Photos = () => {
   const [selections, setSelections] = useState<number>(0);
 
   const selectHandler = useCallback<GridSelectionHandler>((selections) => {
-    if (Object.keys(selections).length === 0) {
+    const selectionCount = getSelectionCount(selections);
+
+    if (selectionCount === 0) {
       return setOpen(false);
     }
 
-    setSelections(
-      Object.values(selections).flatMap((segments) =>
-        Object.values(segments).flatMap((seg) => seg)
-      ).length
-    );
+    setSelections(selectionCount);
+
     setOpen(true);
   }, []);
 
   const ref = useRef<HTMLDivElement>(null);
+  const gridRef = createRef<GridOps>();
 
   return (
     <>
       <SelectBar
         open={open}
         selections={selections}
-        onClose={() => setOpen(false)}
+        onClose={() => gridRef.current?.resetSelection()}
         controls={selectBarControls}
       />
       <div className='photos' ref={ref}>
         <Grid
+          ref={gridRef}
           gridData={gridData}
           config={gridConfig}
           parent={ref}
