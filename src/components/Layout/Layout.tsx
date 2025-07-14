@@ -17,7 +17,7 @@ const Layout = (props: LayoutProps): ReactElement => {
           <Navigation />
           <StorageBar />
         </SideBar>
-        <div className='page-content'>{props.children}</div>
+        <main className='page-content'>{props.children}</main>
       </div>
     </div>
   );
