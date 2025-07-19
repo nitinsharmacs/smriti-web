@@ -1,4 +1,4 @@
 export interface ProgressBarProps {
-  lineWeight: number;
+  lineWeight?: number;
   value: number;
 }

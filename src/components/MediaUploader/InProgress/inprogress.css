@@ -1,0 +1,15 @@
+.upload-in-progress {
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-progressbar {
+  margin-top: 1.5em;
+}
+
+.items-completion-indicator {
+  font-size: 0.8rem;
+  color: var(--sub-text-fg-color);
+  text-align: right;
+}

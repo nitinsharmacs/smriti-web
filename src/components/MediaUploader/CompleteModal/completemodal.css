@@ -1,0 +1,28 @@
+.upload-complete-modal {
+  display: flex;
+}
+
+.upload-complete-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-summary {
+  line-height: 1.2;
+  font-size: 0.9rem;
+  align-items: start;
+  margin: 1em 0em;
+}
+.upload-preview {
+  width: 150px;
+  height: 150px;
+}
+.upload-preview img {
+  object-fit: cover;
+  width: 150px;
+  height: 150px;
+}
+
+.complete-controls {
+  margin-top: auto;
+}

@@ -1,0 +1,9 @@
+.retry-modal {
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.retry-modal-heading {
+  margin-bottom: 1em;
+}

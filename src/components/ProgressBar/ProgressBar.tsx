@@ -1,6 +1,6 @@
 import { LinearProgress } from '@mui/material';
 import './progressbar.css';
-import type { ProgressBarProps } from 'src/components/ProgressBar/progressbar.types';
+import type { ProgressBarProps } from 'src/components/ProgressBar/types';
 
 const ProgressBar = (props: ProgressBarProps) => {
   return (

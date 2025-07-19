@@ -1,0 +1,27 @@
+.upload-media-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--main-bg-color);
+  padding: 1em;
+  border-radius: 4px;
+  margin: 0.5em 0;
+}
+
+.media-icon,
+.media-name,
+.media-status {
+  line-height: 0;
+}
+
+.media-name {
+  margin-left: 1em;
+}
+
+.media-status {
+  margin-left: auto;
+}
+
+.media-status > button {
+  padding: 0;
+  color: var(--main-text-fg-color);
+}

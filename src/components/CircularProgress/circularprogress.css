@@ -1,0 +1,7 @@
+.circular-progressbar-bg {
+  color: var(--highlight-bg-color);
+}
+
+.circular-progressbar-stroke {
+  color: var(--main-text-fg-color);
+}

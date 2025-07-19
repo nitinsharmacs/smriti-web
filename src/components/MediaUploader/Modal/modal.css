@@ -1,0 +1,7 @@
+.upload-txn-modal {
+  max-width: 400px;
+  background-color: var(--menu-bg-color);
+  color: var(--main-text-fg-color);
+  padding: 1em;
+  border-radius: 4px;
+}
