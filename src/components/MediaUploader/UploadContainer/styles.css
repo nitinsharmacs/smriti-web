@@ -1,0 +1,14 @@
+.upload-container {
+  position: fixed;
+  width: 450px;
+  max-height: 500px;
+  padding: 1em;
+  bottom: 1em;
+  left: 0.5em;
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column;
+  row-gap: 1em;
+  overflow: auto;
+  z-index: 100;
+}

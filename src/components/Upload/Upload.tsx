@@ -2,6 +2,7 @@ import UploadIcon from '@mui/icons-material/Upload';
 import { Button, IconButton } from '@mui/material';
 
 import './upload.css';
+import { createUploadTxn } from 'src/components/MediaUploader/UploadProvider';
 
 const Upload = () => {
   return (
@@ -12,6 +13,7 @@ const Upload = () => {
         startIcon={<UploadIcon />}
         className='upload-btn-web'
         sx={{ textTransform: 'inherit' }}
+        onClick={() => createUploadTxn([])}
       >
         Upload
       </Button>

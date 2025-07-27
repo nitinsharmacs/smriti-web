@@ -13,10 +13,12 @@
   align-items: start;
   margin: 1em 0em;
 }
+
 .upload-preview {
   width: 150px;
   height: 150px;
 }
+
 .upload-preview img {
   object-fit: cover;
   width: 150px;

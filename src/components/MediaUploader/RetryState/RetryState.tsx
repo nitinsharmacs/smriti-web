@@ -4,9 +4,10 @@ import Button from 'src/components/Button/Button';
 import Modal from 'src/components/MediaUploader/Modal/Modal';
 import CollapsableMediaItems from 'src/components/MediaUploader/CollapsableMediaItems/CollapsableMediaItems';
 
-import './retrymodal.css';
+import './styles.css';
+import type { RetryStateProps } from 'src/components/MediaUploader/RetryState/types';
 
-const RetryModal = () => {
+const RetryState = (props: RetryStateProps) => {
   const [showMore, setShowMore] = useState<boolean>(false);
 
   const showMoreHandler = useCallback(() => {
@@ -16,9 +17,14 @@ const RetryModal = () => {
   return (
     <Modal>
       <div className='retry-modal'>
-        <h4 className='retry-modal-heading'>4 unfinished upload</h4>
+        <h4 className='retry-modal-heading'>
+          {props.targetUploads - props.achievedUploads} out of{' '}
+          {props.targetUploads} unfinished upload
+        </h4>
         <div className='retry-controls'>
-          <Button variant='contained'>Retry</Button>
+          <Button variant='contained' onClick={props.onRetry}>
+            Retry
+          </Button>
           <Button
             variant='text'
             onClick={showMoreHandler}
@@ -27,10 +33,10 @@ const RetryModal = () => {
             Show more
           </Button>
         </div>
-        <CollapsableMediaItems open={showMore} />
+        <CollapsableMediaItems mediaItems={props.mediaItems} open={showMore} />
       </div>
     </Modal>
   );
 };
 
-export default RetryModal;
+export default RetryState;

@@ -5,11 +5,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ReplayIcon from '@mui/icons-material/Replay';
 import ErrorIcon from '@mui/icons-material/Error';
 
-import {
-  MediaType,
-  MediaUploadStatus,
-  type MediaItemProps,
-} from 'src/components/MediaUploader/MediaItem/types';
+import { type MediaItemProps } from 'src/components/MediaUploader/MediaItem/types';
+import { MediaType, MediaUploadStatus } from '../types';
 import './mediaitem.css';
 import { IconButton } from '@mui/material';
 

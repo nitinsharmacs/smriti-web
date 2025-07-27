@@ -2,14 +2,14 @@ import Collapse from '@mui/material/Collapse';
 import { useRef } from 'react';
 import type { CollapsableMediaItemsProps } from 'src/components/MediaUploader/CollapsableMediaItems/types';
 import MediaItem from 'src/components/MediaUploader/MediaItem/MediaItem';
-import {
-  MediaType,
-  MediaUploadStatus,
-} from 'src/components/MediaUploader/MediaItem/types';
+import { MediaType, MediaUploadStatus } from '../types';
 
 import './collapsablemediaitems.css';
 
-const CollapsableMediaItems = ({ open }: CollapsableMediaItemsProps) => {
+const CollapsableMediaItems = ({
+  open,
+  mediaItems,
+}: CollapsableMediaItemsProps) => {
   const uploadItemsRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -20,7 +20,15 @@ const CollapsableMediaItems = ({ open }: CollapsableMediaItemsProps) => {
     >
       <Collapse in={open} timeout='auto' unmountOnExit>
         <div>
-          <MediaItem
+          {mediaItems.map((item) => (
+            <MediaItem
+              name={item.name}
+              type={item.type}
+              status={item.status}
+              progress={item.progress}
+            />
+          ))}
+          {/* <MediaItem
             name='screenshot.jpeg'
             type={MediaType.Image}
             status={MediaUploadStatus.InProgress}
@@ -57,7 +65,7 @@ const CollapsableMediaItems = ({ open }: CollapsableMediaItemsProps) => {
             name='screenshot.jpeg'
             type={MediaType.Image}
             status={MediaUploadStatus.Failed}
-          />
+          /> */}
         </div>
       </Collapse>
     </div>

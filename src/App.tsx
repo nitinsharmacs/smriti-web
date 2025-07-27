@@ -1,10 +1,12 @@
+import Layout from 'src/components/Layout/Layout';
 import './App.css';
-import Layout from './components/Layout/Layout';
-import Photos from './screens/Photos/Photos';
+import UploadProvider from 'src/components/MediaUploader/UploadProvider';
+import Photos from 'src/screens/Photos/Photos';
 
 function App() {
   return (
     <div className='app'>
+      <UploadProvider />
       <Layout>
         <Photos />
       </Layout>

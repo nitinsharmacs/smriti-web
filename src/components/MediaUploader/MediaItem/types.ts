@@ -1,13 +1,7 @@
-export enum MediaType {
-  Image,
-  Video,
-}
-
-export enum MediaUploadStatus {
-  Success,
-  Failed, // for failed, cancelled etc.
-  InProgress,
-}
+import type {
+  MediaType,
+  MediaUploadStatus,
+} from 'src/components/MediaUploader/types';
 
 export interface MediaItemProps {
   name: string;
