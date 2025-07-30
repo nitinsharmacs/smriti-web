@@ -1,6 +1,6 @@
 import { type UploadTxnType } from 'src/components/MediaUploader/types';
 import { doNothing } from 'src/helpers';
-import UploadTransaction from 'src/model/UploadTransaction';
+import UploadTransaction from 'src/models/UploadTransaction';
 import UploadService from 'src/services/UploadService';
 
 export type TransactionEntries = {

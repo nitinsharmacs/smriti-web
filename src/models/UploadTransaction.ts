@@ -9,8 +9,6 @@ import {
   type UploadTxnType,
 } from 'src/components/MediaUploader/types';
 
-export type cb = () => void;
-
 export type FileType = {
   name: string;
   type: MediaType;
@@ -23,11 +21,11 @@ class UploadTransaction {
 
   constructor(txnId: string, files: FileList) {
     this._txnId = txnId;
-    this.txnState = this.createProgressState(files);
     this.status = UploadTxnStatus.InProgress;
+    this.txnState = UploadTransaction.createProgressState(files);
   }
 
-  createProgressState(files: FileList): InProgressStateType {
+  static createProgressState(files: FileList): InProgressStateType {
     const mediaItems: MediaItemType[] = [];
 
     for (const file of files) {
@@ -77,6 +75,7 @@ class UploadTransaction {
       item.progress = progresses[index];
 
       if (item.progress === 100) {
+        item.status = MediaUploadStatus.Success;
         state.achievedUploads += 1;
       }
     });
@@ -110,6 +109,8 @@ class UploadTransaction {
   }
 
   complete(): boolean {
+    if (this.status !== UploadTxnStatus.InProgress) return false;
+
     const state = this.txnState as InProgressStateType;
 
     if (state.mediaItems.every((item) => item.progress === 100)) {
@@ -137,9 +138,13 @@ class UploadTransaction {
     return true;
   }
 
-  stop(): void {
+  stop(): boolean {
+    if (this.status === UploadTxnStatus.Retry) return false;
+
     this.txnState = this.createRetryState();
     this.status = UploadTxnStatus.Retry;
+
+    return true;
   }
 
   anyFileUploaded(): boolean {

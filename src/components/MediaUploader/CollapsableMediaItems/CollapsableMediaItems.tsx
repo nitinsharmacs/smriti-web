@@ -28,44 +28,6 @@ const CollapsableMediaItems = ({
               progress={item.progress}
             />
           ))}
-          {/* <MediaItem
-            name='screenshot.jpeg'
-            type={MediaType.Image}
-            status={MediaUploadStatus.InProgress}
-            progress={50}
-          />
-          <MediaItem
-            name='screenshot.jpeg'
-            type={MediaType.Image}
-            status={MediaUploadStatus.InProgress}
-            progress={50}
-          />
-          <MediaItem
-            name='screenshot.jpeg'
-            type={MediaType.Image}
-            status={MediaUploadStatus.Success}
-          />
-          <MediaItem
-            name='screenshot.jpeg'
-            type={MediaType.Image}
-            status={MediaUploadStatus.Success}
-          />
-          <MediaItem
-            name='screenshot.jpeg'
-            type={MediaType.Image}
-            status={MediaUploadStatus.InProgress}
-            progress={80}
-          />
-          <MediaItem
-            name='screenshot.jpeg'
-            type={MediaType.Image}
-            status={MediaUploadStatus.Failed}
-          />
-          <MediaItem
-            name='screenshot.jpeg'
-            type={MediaType.Image}
-            status={MediaUploadStatus.Failed}
-          /> */}
         </div>
       </Collapse>
     </div>

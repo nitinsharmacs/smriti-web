@@ -13,9 +13,14 @@ const Upload = () => {
     type: 'text/plain',
   });
 
+  const file3 = new File(['Hello world'], 'hello3.png', {
+    type: 'image/png',
+  });
+
   const dataTransfer = new DataTransfer();
   dataTransfer.items.add(file1);
   dataTransfer.items.add(file2);
+  dataTransfer.items.add(file3);
 
   return (
     <div className='upload'>

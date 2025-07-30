@@ -25,7 +25,7 @@ class UploadService {
   ): () => void {
     // upload and return some progressor
 
-    let progresses = new Array(2).fill(0);
+    let progresses = new Array(files.length).fill(0);
 
     const steps = deltas(files.length);
 
