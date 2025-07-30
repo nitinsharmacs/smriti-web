@@ -5,6 +5,18 @@ import './upload.css';
 import { createUploadTxn } from 'src/components/MediaUploader/UploadProvider';
 
 const Upload = () => {
+  const file1 = new File(['Hello world'], 'hello.txt', {
+    type: 'text/plain',
+  });
+
+  const file2 = new File(['Hello world'], 'hello2.txt', {
+    type: 'text/plain',
+  });
+
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file1);
+  dataTransfer.items.add(file2);
+
   return (
     <div className='upload'>
       <Button
@@ -13,12 +25,16 @@ const Upload = () => {
         startIcon={<UploadIcon />}
         className='upload-btn-web'
         sx={{ textTransform: 'inherit' }}
-        onClick={() => createUploadTxn([])}
+        onClick={() => createUploadTxn(dataTransfer.files)}
       >
         Upload
       </Button>
 
-      <IconButton aria-label='upload' className='upload-btn-mob'>
+      <IconButton
+        aria-label='upload'
+        className='upload-btn-mob'
+        onClick={() => createUploadTxn(dataTransfer.files)}
+      >
         <UploadIcon />
       </IconButton>
     </div>

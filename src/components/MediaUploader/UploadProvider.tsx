@@ -1,50 +1,32 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import UploadContainer from 'src/components/MediaUploader/UploadContainer/UploadContainer';
 import UploadTxn from 'src/components/MediaUploader/UploadTxn/UploadTxn';
 import UploadContext from './UploadContext';
-import type {
-  InProgressStateType,
-  ProviderProps,
-  UploadTxnCreator,
-  UploadTxnType,
-} from './types';
-import { MediaType, MediaUploadStatus, UploadTxnStatus } from './types';
-import UploadTransaction from 'src/model/UploadTransaction';
+import type { ProviderProps, UploadTxnCreator, UploadTxnType } from './types';
 import type { UploadTxnControl } from 'src/components/MediaUploader/UploadTxn/types';
+import UploadController from 'src/controllers/UploadController';
 
 export let createUploadTxn: UploadTxnCreator;
 
 const UploadProvider = ({ children }: ProviderProps) => {
   const [transactions, updateTxn] = useState<UploadTxnType[]>([]);
-  const txnUploaders: UploadTransaction[] = [];
+
+  const uploadController = useMemo(() => new UploadController(), []);
+
+  const updateTransactions = useCallback(() => {
+    updateTxn(uploadController.getTransactions());
+  }, []);
 
   const createUploadTxnHandler = useCallback<UploadTxnCreator>((files) => {
-    const txn = new UploadTransaction(files);
-    txnUploaders.push(txn);
+    const txnId = uploadController.newUpload(
+      files,
+      updateTransactions,
+      updateTransactions
+    );
 
-    txn.startUpload();
+    console.log('created new txn', txnId);
 
-    updateTxn((prev) => {
-      return [...prev, txn.getObject()];
-    });
-
-    txn.onProgress(() => {
-      console.log('called');
-
-      updateTxn((prev) => {
-        const index = prev.findIndex((_txn) => _txn.txnId === txn.txnId);
-        prev[index] = txn.getObject();
-        return [...prev];
-      });
-    });
-
-    txn.onComplete(() => {
-      updateTxn((prev) => {
-        const index = prev.findIndex((_txn) => _txn.txnId === txn.txnId);
-        prev[index] = txn.getObject();
-        return [...prev];
-      });
-    });
+    updateTransactions();
   }, []);
 
   const completeTxnHandler = useCallback<UploadTxnControl>((txnId) => {
@@ -52,29 +34,28 @@ const UploadProvider = ({ children }: ProviderProps) => {
   }, []);
 
   const stopTxnHandler = useCallback<UploadTxnControl>((txnId) => {
-    const txn = txnUploaders.find((uploader) => uploader.txnId === txnId);
+    uploadController.stopUpload(txnId);
 
-    if (!txn) {
-      return;
-    }
+    updateTransactions();
 
-    txn.stop();
-
-    updateTxn((prev) => {
-      const index = prev.findIndex((_txn) => _txn.txnId === txn.txnId);
-      prev[index] = txn?.getObject();
-      return [...prev];
-    });
-
-    console.log('stop transaction, ', txnId);
+    console.log('Stopping Transaction, ', txnId);
   }, []);
 
   const retryTxnHandler = useCallback<UploadTxnControl>((txnId) => {
-    // should create a new transaction for remaining uploads.
     console.log('retry transaction, ', txnId);
+
+    const files = uploadController.getFailedTxnMediaFiles(txnId);
+
+    if (files.length > 0) createUploadTxnHandler(files);
+
+    uploadController.completeTxnPartially(txnId);
+
+    updateTransactions();
   }, []);
 
   createUploadTxn = createUploadTxnHandler;
+
+  console.log(transactions);
 
   return (
     <UploadContext value={{ createUploadTxn: createUploadTxnHandler }}>

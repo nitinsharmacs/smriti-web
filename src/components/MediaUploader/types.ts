@@ -27,6 +27,7 @@ export type MediaItemType = {
   name: string;
   status: MediaUploadStatus;
   progress: number;
+  file?: File;
 };
 
 export type InProgressStateType = UploadTxnState & {

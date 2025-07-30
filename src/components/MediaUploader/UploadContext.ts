@@ -1,7 +1,6 @@
 import React from 'react';
 import type { ProviderContext } from './types';
-
-const doNothing = () => {};
+import { doNothing } from 'src/helpers';
 
 export default React.createContext<ProviderContext>({
   createUploadTxn: doNothing,

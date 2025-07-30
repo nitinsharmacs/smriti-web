@@ -13,16 +13,18 @@ import { useCallback } from 'react';
 
 const UploadTxn = (props: UploadTxnProps) => {
   const onStopHandler = useCallback(() => {
+    console.log(props.txnId);
+
     props.onStop(props.txnId);
-  }, []);
+  }, [props.txnId]);
 
   const onCompleteHandler = useCallback(() => {
     props.onComplete(props.txnId);
-  }, []);
+  }, [props.txnId]);
 
   const onRetryHandler = useCallback(() => {
     props.onRetry(props.txnId);
-  }, []);
+  }, [props.txnId]);
 
   switch (props.status) {
     case UploadTxnStatus.InProgress:
@@ -56,12 +58,16 @@ const UploadTxn = (props: UploadTxnProps) => {
             mediaItems={retryState.mediaItems}
             onRetry={onRetryHandler}
           />
-          <CompleteState
-            achievedUploads={retryState.achievedUploads}
-            targetUploads={retryState.targetUploads}
-            previews={retryState.previews}
-            onComplete={onCompleteHandler}
-          />
+          {retryState.achievedUploads > 0 ? (
+            <CompleteState
+              achievedUploads={retryState.achievedUploads}
+              targetUploads={retryState.targetUploads}
+              previews={retryState.previews}
+              onComplete={onCompleteHandler}
+            />
+          ) : (
+            <></>
+          )}
         </>
       );
     default:

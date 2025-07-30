@@ -8,7 +8,8 @@ function App() {
     <div className='app'>
       <UploadProvider />
       <Layout>
-        <Photos />
+        {/* <Photos /> */}
+        <div>hi</div>
       </Layout>
     </div>
   );

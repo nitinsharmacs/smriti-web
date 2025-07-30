@@ -4,116 +4,146 @@ import {
   UploadTxnStatus,
   type CompletedStateType,
   type InProgressStateType,
+  type MediaItemType,
   type RetryStateType,
-  type UploadTxnState,
   type UploadTxnType,
 } from 'src/components/MediaUploader/types';
 
 export type cb = () => void;
 
+export type FileType = {
+  name: string;
+  type: MediaType;
+};
+
 class UploadTransaction {
-  private files: FileList;
   private _txnId: string;
   private txnState: InProgressStateType | RetryStateType | CompletedStateType;
   private status: UploadTxnStatus;
-  private interval: number | undefined;
-  private timeout: number | undefined;
 
-  constructor(files: FileList) {
-    this.files = files;
-  }
-
-  createProgressState(): InProgressStateType {
-    return {
-      targetUploads: 4,
-      achievedUploads: 2,
-      mediaItems: [
-        {
-          type: MediaType.Image,
-          name: 'screenshot.jpeg',
-          status: MediaUploadStatus.InProgress,
-          progress: 10,
-        },
-        {
-          type: MediaType.Image,
-          name: 'screenshot2.jpeg',
-          status: MediaUploadStatus.InProgress,
-          progress: 50,
-        },
-      ],
-    };
-  }
-
-  startUpload(): void {
-    // start upload using upload service;
-    this._txnId = 'txn1';
-    this.txnState = this.createProgressState();
+  constructor(txnId: string, files: FileList) {
+    this._txnId = txnId;
+    this.txnState = this.createProgressState(files);
     this.status = UploadTxnStatus.InProgress;
   }
 
-  onProgress(cb: cb): void {
-    // call cb on progress
-    this.interval = setInterval(() => {
-      const state = this.txnState as InProgressStateType;
-      state.mediaItems.forEach((item) => {
-        if (item.progress < 100) item.progress += 10;
-      });
-      cb();
-    }, 1500);
+  createProgressState(files: FileList): InProgressStateType {
+    const mediaItems: MediaItemType[] = [];
 
-    setTimeout(() => {
-      clearInterval(this.interval);
-    }, 15000);
+    for (const file of files) {
+      mediaItems.push({
+        name: file.name,
+        progress: 0,
+        status: MediaUploadStatus.InProgress,
+        type: file.type.startsWith('image/')
+          ? MediaType.Image
+          : MediaType.Video,
+        file,
+      });
+    }
+
+    return {
+      targetUploads: mediaItems.length,
+      achievedUploads: 0,
+      mediaItems,
+    };
   }
 
   createCompleteState(): CompletedStateType {
     return {
-      targetUploads: 4,
-      achievedUploads: 4,
+      targetUploads: this.txnState.targetUploads,
+      achievedUploads: this.txnState.targetUploads,
       previews: [
         'https://fastly.picsum.photos/id/834/614/519.jpg?hmac=zvaiEABLMR3kZJgkZ9IN8OfB0-P10M_z3fH9hEcNS4k',
       ],
     };
-  }
-
-  onComplete(cb: cb): void {
-    // call cb on complete
-    this.timeout = setTimeout(() => {
-      this.txnState = this.createCompleteState();
-      this.status = UploadTxnStatus.Success;
-      cb();
-    }, 15500);
   }
 
   createRetryState(): RetryStateType {
     return {
-      targetUploads: 4,
-      achievedUploads: 2,
-      mediaItems: [
-        {
-          type: MediaType.Image,
-          name: 'screenshot.jpeg',
-          status: MediaUploadStatus.Failed,
-          progress: 10,
-        },
-        {
-          type: MediaType.Image,
-          name: 'screenshot 2.jpeg',
-          status: MediaUploadStatus.Failed,
-          progress: 10,
-        },
-      ],
+      ...this.txnState,
+      mediaItems: this.getPendingMedia(),
       previews: [
         'https://fastly.picsum.photos/id/834/614/519.jpg?hmac=zvaiEABLMR3kZJgkZ9IN8OfB0-P10M_z3fH9hEcNS4k',
       ],
     };
   }
 
+  updateMediaProgresses(progresses: number[]): void {
+    const state = this.txnState as InProgressStateType;
+
+    state.mediaItems.forEach((item, index) => {
+      if (item.progress === 100) return;
+      item.progress = progresses[index];
+
+      if (item.progress === 100) {
+        state.achievedUploads += 1;
+      }
+    });
+  }
+
+  getPendingMedia(): MediaItemType[] {
+    const state = this.txnState as InProgressStateType;
+    return state.mediaItems
+      .filter((item) => item.progress < 100)
+      .map((item) => ({
+        ...item,
+        progress: 0,
+        status: MediaUploadStatus.Failed,
+      }));
+  }
+
+  getFailedMediaFiles(): FileList {
+    const dataTransfer = new DataTransfer();
+
+    if (this.status !== UploadTxnStatus.Retry) {
+      return dataTransfer.files;
+    }
+
+    const state = this.txnState as RetryStateType;
+
+    state.mediaItems.forEach(
+      (media) => media.file && dataTransfer.items.add(media.file)
+    );
+
+    return dataTransfer.files;
+  }
+
+  complete(): boolean {
+    const state = this.txnState as InProgressStateType;
+
+    if (state.mediaItems.every((item) => item.progress === 100)) {
+      this.txnState = this.createCompleteState();
+      this.status = UploadTxnStatus.Success;
+      return true;
+    }
+
+    return false;
+  }
+
+  completePartially(): boolean {
+    if (this.status !== UploadTxnStatus.Retry) return false;
+
+    const state = this.txnState as RetryStateType;
+
+    this.txnState = {
+      targetUploads: state.targetUploads,
+      achievedUploads: state.achievedUploads,
+      previews: state.previews,
+    };
+
+    this.status = UploadTxnStatus.Success;
+
+    return true;
+  }
+
   stop(): void {
-    clearInterval(this.interval);
-    clearTimeout(this.timeout);
     this.txnState = this.createRetryState();
     this.status = UploadTxnStatus.Retry;
+  }
+
+  anyFileUploaded(): boolean {
+    return this.txnState.achievedUploads > 0;
   }
 
   getObject(): UploadTxnType {
