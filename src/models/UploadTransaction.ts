@@ -6,6 +6,7 @@ import {
   type InProgressStateType,
   type MediaItemType,
   type RetryStateType,
+  type UploadTxnState,
   type UploadTxnType,
 } from 'src/components/MediaUploader/types';
 
@@ -17,11 +18,11 @@ export type FileType = {
 class UploadTransaction {
   private _txnId: string;
   private txnState: InProgressStateType | RetryStateType | CompletedStateType;
-  private status: UploadTxnStatus;
+  private _status: UploadTxnStatus;
 
   constructor(txnId: string, files: FileList) {
     this._txnId = txnId;
-    this.status = UploadTxnStatus.InProgress;
+    this._status = UploadTxnStatus.InProgress;
     this.txnState = UploadTransaction.createProgressState(files);
   }
 
@@ -60,7 +61,10 @@ class UploadTransaction {
   createRetryState(): RetryStateType {
     return {
       ...this.txnState,
-      mediaItems: this.getPendingMedia(),
+      mediaItems: this.getPendingMedia().map((item) => ({
+        ...item,
+        status: MediaUploadStatus.Failed,
+      })),
       previews: [
         'https://fastly.picsum.photos/id/834/614/519.jpg?hmac=zvaiEABLMR3kZJgkZ9IN8OfB0-P10M_z3fH9hEcNS4k',
       ],
@@ -72,7 +76,7 @@ class UploadTransaction {
 
     state.mediaItems.forEach((item, index) => {
       if (item.progress === 100) return;
-      item.progress = progresses[index];
+      item.progress = Math.min(100, progresses[index]);
 
       if (item.progress === 100) {
         item.status = MediaUploadStatus.Success;
@@ -83,19 +87,13 @@ class UploadTransaction {
 
   getPendingMedia(): MediaItemType[] {
     const state = this.txnState as InProgressStateType;
-    return state.mediaItems
-      .filter((item) => item.progress < 100)
-      .map((item) => ({
-        ...item,
-        progress: 0,
-        status: MediaUploadStatus.Failed,
-      }));
+    return state.mediaItems.filter((item) => item.progress < 100);
   }
 
   getFailedMediaFiles(): FileList {
     const dataTransfer = new DataTransfer();
 
-    if (this.status !== UploadTxnStatus.Retry) {
+    if (this._status !== UploadTxnStatus.Retry) {
       return dataTransfer.files;
     }
 
@@ -109,13 +107,11 @@ class UploadTransaction {
   }
 
   complete(): boolean {
-    if (this.status !== UploadTxnStatus.InProgress) return false;
+    if (this._status !== UploadTxnStatus.InProgress) return false;
 
-    const state = this.txnState as InProgressStateType;
-
-    if (state.mediaItems.every((item) => item.progress === 100)) {
+    if (this.txnState.achievedUploads === this.txnState.targetUploads) {
       this.txnState = this.createCompleteState();
-      this.status = UploadTxnStatus.Success;
+      this._status = UploadTxnStatus.Success;
       return true;
     }
 
@@ -123,7 +119,7 @@ class UploadTransaction {
   }
 
   completePartially(): boolean {
-    if (this.status !== UploadTxnStatus.Retry) return false;
+    if (this._status !== UploadTxnStatus.Retry) return false;
 
     const state = this.txnState as RetryStateType;
 
@@ -133,16 +129,16 @@ class UploadTransaction {
       previews: state.previews,
     };
 
-    this.status = UploadTxnStatus.Success;
+    this._status = UploadTxnStatus.Success;
 
     return true;
   }
 
   stop(): boolean {
-    if (this.status === UploadTxnStatus.Retry) return false;
+    if (this._status === UploadTxnStatus.Retry) return false;
 
     this.txnState = this.createRetryState();
-    this.status = UploadTxnStatus.Retry;
+    this._status = UploadTxnStatus.Retry;
 
     return true;
   }
@@ -154,13 +150,21 @@ class UploadTransaction {
   getObject(): UploadTxnType {
     return {
       txnId: this._txnId,
-      state: this.txnState,
-      status: this.status,
+      state: { ...this.txnState },
+      status: this._status,
     };
   }
 
   public get txnId(): string {
     return this._txnId;
+  }
+
+  public get state(): UploadTxnState {
+    return { ...this.txnState };
+  }
+
+  public get status(): UploadTxnStatus {
+    return this._status;
   }
 }
 
