@@ -11,8 +11,9 @@ import {
 } from 'src/components/MediaUploader/types';
 
 export type FileType = {
+  id: string;
   name: string;
-  type: MediaType;
+  type: string;
 };
 
 class UploadTransaction {
@@ -20,26 +21,20 @@ class UploadTransaction {
   private txnState: InProgressStateType | RetryStateType | CompletedStateType;
   private _status: UploadTxnStatus;
 
-  constructor(txnId: string, files: FileList) {
+  constructor(txnId: string, files: FileType[]) {
     this._txnId = txnId;
     this._status = UploadTxnStatus.InProgress;
     this.txnState = UploadTransaction.createProgressState(files);
   }
 
-  static createProgressState(files: FileList): InProgressStateType {
-    const mediaItems: MediaItemType[] = [];
-
-    for (const file of files) {
-      mediaItems.push({
-        name: file.name,
-        progress: 0,
-        status: MediaUploadStatus.InProgress,
-        type: file.type.startsWith('image/')
-          ? MediaType.Image
-          : MediaType.Video,
-        file,
-      });
-    }
+  static createProgressState(files: FileType[]): InProgressStateType {
+    const mediaItems: MediaItemType[] = files.map((file) => ({
+      id: file.id,
+      name: file.name,
+      type: file.type.startsWith('image/') ? MediaType.Image : MediaType.Video,
+      progress: 0,
+      status: MediaUploadStatus.InProgress,
+    }));
 
     return {
       targetUploads: mediaItems.length,
@@ -85,25 +80,19 @@ class UploadTransaction {
     });
   }
 
-  getPendingMedia(): MediaItemType[] {
+  private getPendingMedia(): MediaItemType[] {
     const state = this.txnState as InProgressStateType;
     return state.mediaItems.filter((item) => item.progress < 100);
   }
 
-  getFailedMediaFiles(): FileList {
-    const dataTransfer = new DataTransfer();
-
+  getFailedMediaIds(): string[] {
     if (this._status !== UploadTxnStatus.Retry) {
-      return dataTransfer.files;
+      return [];
     }
 
     const state = this.txnState as RetryStateType;
 
-    state.mediaItems.forEach(
-      (media) => media.file && dataTransfer.items.add(media.file)
-    );
-
-    return dataTransfer.files;
+    return state.mediaItems.map((item) => item.id);
   }
 
   complete(): boolean {

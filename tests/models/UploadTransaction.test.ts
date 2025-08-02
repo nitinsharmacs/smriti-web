@@ -4,42 +4,60 @@ import {
   UploadTxnStatus,
   type CompletedStateType,
   type InProgressStateType,
-  type MediaItemType,
   type RetryStateType,
   type UploadTxnType,
 } from 'src/components/MediaUploader/types';
-import UploadTransaction from 'src/models/UploadTransaction';
+import UploadTransaction, { type FileType } from 'src/models/UploadTransaction';
 import { describe, expect, it as baseIt, vi, type Mock } from 'vitest';
 
-const file1 = new File(['Hello world'], 'hello.txt', {
+const file1 = {
   type: 'text/plain',
-});
+  name: 'hello.txt',
+  id: 'txn1-media-1',
+};
 
-const file2 = new File(['Hello world'], 'hello2.txt', {
+// const file1 = new File(['Hello world'], 'hello.txt', {
+//   type: 'text/plain',
+// });
+
+const file2 = {
   type: 'text/plain',
-});
+  name: 'hello2.txt',
+  id: 'txn1-media-2',
+};
+// const file2 = new File(['Hello world'], 'hello2.txt', {
+//   type: 'text/plain',
+// });
 
-const file3 = new File(['Hello world'], 'hello3.png', {
+const file3 = {
   type: 'image/png',
-});
+  name: 'hello3.png',
+  id: 'txn1-media-3',
+};
+// const file3 = new File(['Hello world'], 'hello3.png', {
+//   type: 'image/png',
+// });
 
 const it = baseIt.extend<{
-  mockFileList: { fileList: FileList; mockNext: Mock };
+  mockFileList: { fileList: FileType[]; mockNext: Mock };
 }>({
   mockFileList: async ({}, use) => {
     const mockNext = vi
       .fn()
-      .mockReturnValueOnce({ value: file1, done: false })
-      .mockReturnValueOnce({ value: file2, done: false })
-      .mockReturnValueOnce({ value: file3, done: false })
-      .mockReturnValue({ value: undefined, done: true });
+      .mockReturnValueOnce(file1)
+      .mockReturnValueOnce(file2)
+      .mockReturnValue(file3);
 
-    const fileListMock = {
-      [Symbol.iterator]: () => ({ next: mockNext }),
+    const files = [file1, file2, file2];
+
+    const fileTypeListMock = {
+      map: (cb: (arg0: any) => any) => {
+        return files.map(() => cb(mockNext()));
+      },
       mockNext,
-    } as unknown as FileList;
+    } as unknown as FileType[];
 
-    await use({ fileList: fileListMock, mockNext });
+    await use({ fileList: fileTypeListMock, mockNext });
   },
 });
 
@@ -49,7 +67,7 @@ describe('UploadTransaction', () => {
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
     expect(txn.txnId).toBe(txnId);
-    expect(mockFileList.mockNext).toBeCalledTimes(4);
+    expect(mockFileList.mockNext).toBeCalledTimes(3);
   });
 
   it('should create initial progress state', ({ mockFileList }) => {
@@ -63,21 +81,21 @@ describe('UploadTransaction', () => {
           name: 'hello.txt',
           type: MediaType.Video,
           status: MediaUploadStatus.InProgress,
-          file: file1,
+          id: 'txn1-media-1',
           progress: 0,
         },
         {
           name: 'hello2.txt',
           type: MediaType.Video,
           status: MediaUploadStatus.InProgress,
-          file: file2,
+          id: 'txn1-media-2',
           progress: 0,
         },
         {
           name: 'hello3.png',
           type: MediaType.Image,
           status: MediaUploadStatus.InProgress,
-          file: file3,
+          id: 'txn1-media-3',
           progress: 0,
         },
       ],
@@ -115,21 +133,21 @@ describe('UploadTransaction', () => {
           name: 'hello.txt',
           type: MediaType.Video,
           status: MediaUploadStatus.Failed,
-          file: file1,
+          id: 'txn1-media-1',
           progress: 0,
         },
         {
           name: 'hello2.txt',
           type: MediaType.Video,
           status: MediaUploadStatus.Failed,
-          file: file2,
+          id: 'txn1-media-2',
           progress: 0,
         },
         {
           name: 'hello3.png',
           type: MediaType.Image,
           status: MediaUploadStatus.Failed,
-          file: file3,
+          id: 'txn1-media-3',
           progress: 0,
         },
       ],
@@ -233,21 +251,21 @@ describe('UploadTransaction', () => {
           name: 'hello.txt',
           type: MediaType.Video,
           status: MediaUploadStatus.Failed,
-          file: file1,
+          id: 'txn1-media-1',
           progress: 0,
         },
         {
           name: 'hello2.txt',
           type: MediaType.Video,
           status: MediaUploadStatus.Failed,
-          file: file2,
+          id: 'txn1-media-2',
           progress: 0,
         },
         {
           name: 'hello3.png',
           type: MediaType.Image,
           status: MediaUploadStatus.Failed,
-          file: file3,
+          id: 'txn1-media-3',
           progress: 0,
         },
       ],
@@ -301,21 +319,21 @@ describe('UploadTransaction', () => {
           name: 'hello.txt',
           type: MediaType.Video,
           status: MediaUploadStatus.Success,
-          file: file1,
+          id: 'txn1-media-1',
           progress: 100,
         },
         {
           name: 'hello2.txt',
           type: MediaType.Video,
           status: MediaUploadStatus.Success,
-          file: file2,
+          id: 'txn1-media-2',
           progress: 100,
         },
         {
           name: 'hello3.png',
           type: MediaType.Image,
           status: MediaUploadStatus.InProgress,
-          file: file3,
+          id: 'txn1-media-3',
           progress: 90,
         },
       ],
@@ -366,22 +384,6 @@ describe('UploadTransaction', () => {
     expect(txn.status).toBe(UploadTxnStatus.InProgress);
   });
 
-  it('should return pending media to upload', ({ mockFileList }) => {
-    const txnId = 'txn1';
-    const txn = new UploadTransaction(txnId, mockFileList.fileList);
-
-    txn.updateMediaProgresses([100, 100, 90]);
-
-    const expectedMedia: MediaItemType = {
-      name: 'hello3.png',
-      status: MediaUploadStatus.InProgress,
-      file: file3,
-      progress: 90,
-      type: MediaType.Image,
-    };
-    expect(txn.getPendingMedia()).toStrictEqual([expectedMedia]);
-  });
-
   it('should return transaction object', ({ mockFileList }) => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
@@ -399,26 +401,50 @@ describe('UploadTransaction', () => {
             name: 'hello.txt',
             type: MediaType.Video,
             status: MediaUploadStatus.Success,
-            file: file1,
+            id: 'txn1-media-1',
             progress: 100,
           },
           {
             name: 'hello2.txt',
             type: MediaType.Video,
             status: MediaUploadStatus.Success,
-            file: file2,
+            id: 'txn1-media-2',
             progress: 100,
           },
           {
             name: 'hello3.png',
             type: MediaType.Image,
             status: MediaUploadStatus.InProgress,
-            file: file3,
+            id: 'txn1-media-3',
             progress: 90,
           },
         ],
       },
     };
     expect(txn.getObject()).toStrictEqual(expected);
+  });
+
+  it('should get failed media Ids', ({ mockFileList }) => {
+    const txnId = 'txn1';
+    const txn = new UploadTransaction(txnId, mockFileList.fileList);
+
+    const progresses = [10, 100, 30];
+    txn.updateMediaProgresses(progresses);
+    txn.stop();
+
+    expect(txn.getFailedMediaIds()).toStrictEqual([
+      'txn1-media-1',
+      'txn1-media-3',
+    ]);
+  });
+
+  it('should get empty failed media Ids if in progress', ({ mockFileList }) => {
+    const txnId = 'txn1';
+    const txn = new UploadTransaction(txnId, mockFileList.fileList);
+
+    const progresses = [10, 100, 30];
+    txn.updateMediaProgresses(progresses);
+
+    expect(txn.getFailedMediaIds()).toStrictEqual([]);
   });
 });

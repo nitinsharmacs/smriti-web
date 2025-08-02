@@ -1,11 +1,16 @@
 import { type UploadTxnType } from 'src/components/MediaUploader/types';
 import { doNothing } from 'src/helpers';
-import UploadTransaction from 'src/models/UploadTransaction';
+import UploadTransaction, { type FileType } from 'src/models/UploadTransaction';
 import UploadService from 'src/services/UploadService';
 
-export type TransactionEntries = {
+type FileEntries = {
+  [key: string]: File;
+};
+
+type TransactionEntries = {
   [key: string]: {
     transaction: UploadTransaction;
+    files: FileEntries;
     stopper: () => void;
   };
 };
@@ -25,8 +30,22 @@ class UploadController {
     onComplete: () => void = doNothing
   ): string {
     const txnId = this.service.createTransaction();
+    const mediaIds = this.service.getTxnMediaIds(txnId);
 
-    const txn = new UploadTransaction(txnId, files);
+    const txnFiles: FileEntries = {};
+    const mediaFiles: FileType[] = [];
+
+    [...files].forEach((file, index) => {
+      mediaFiles.push({
+        id: mediaIds[index],
+        name: file.name,
+        type: file.type,
+      });
+
+      txnFiles[mediaIds[index]] = file;
+    });
+
+    const txn = new UploadTransaction(txnId, mediaFiles);
 
     const stopper = this.service.uploadFiles(
       txnId,
@@ -43,6 +62,7 @@ class UploadController {
 
     this.txnEntries[txnId] = {
       transaction: txn,
+      files: txnFiles,
       stopper,
     };
 
@@ -70,11 +90,14 @@ class UploadController {
   }
 
   getFailedTxnMediaFiles(txnId: string): FileList {
-    return this.txnEntries[txnId].transaction.getFailedMediaFiles();
-  }
+    const txnEntry = this.txnEntries[txnId];
 
-  getTxnObject(txnId: string): UploadTxnType | undefined {
-    return this.txnEntries[txnId].transaction.getObject();
+    const failedMediaIds: string[] = txnEntry.transaction.getFailedMediaIds();
+
+    const dataTransfer = new DataTransfer();
+    failedMediaIds.forEach((id) => dataTransfer.items.add(txnEntry.files[id]));
+
+    return dataTransfer.files;
   }
 
   getTransactions(): UploadTxnType[] {
