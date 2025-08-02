@@ -16,27 +16,17 @@ const file1 = {
   id: 'txn1-media-1',
 };
 
-// const file1 = new File(['Hello world'], 'hello.txt', {
-//   type: 'text/plain',
-// });
-
 const file2 = {
   type: 'text/plain',
   name: 'hello2.txt',
   id: 'txn1-media-2',
 };
-// const file2 = new File(['Hello world'], 'hello2.txt', {
-//   type: 'text/plain',
-// });
 
 const file3 = {
   type: 'image/png',
   name: 'hello3.png',
   id: 'txn1-media-3',
 };
-// const file3 = new File(['Hello world'], 'hello3.png', {
-//   type: 'image/png',
-// });
 
 const it = baseIt.extend<{
   mockFileList: { fileList: FileType[]; mockNext: Mock };

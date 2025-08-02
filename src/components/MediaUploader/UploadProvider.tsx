@@ -5,13 +5,17 @@ import UploadContext from './UploadContext';
 import type { ProviderProps, UploadTxnCreator, UploadTxnType } from './types';
 import type { UploadTxnControl } from 'src/components/MediaUploader/UploadTxn/types';
 import UploadController from 'src/controllers/UploadController';
+import UploadService from 'src/services/UploadService';
 
 export let createUploadTxn: UploadTxnCreator;
 
 const UploadProvider = ({ children }: ProviderProps) => {
   const [transactions, updateTxn] = useState<UploadTxnType[]>([]);
 
-  const uploadController = useMemo(() => new UploadController(), []);
+  const uploadController = useMemo(
+    () => new UploadController(new UploadService()),
+    []
+  );
 
   const updateTransactions = useCallback(() => {
     updateTxn(uploadController.getTransactions());

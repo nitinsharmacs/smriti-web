@@ -16,12 +16,13 @@ type TransactionEntries = {
 };
 
 class UploadController {
-  private service: UploadService;
+  private uploadService: UploadService;
 
   private txnEntries: TransactionEntries;
-  constructor() {
+
+  constructor(uploadService: UploadService) {
     this.txnEntries = {};
-    this.service = new UploadService();
+    this.uploadService = uploadService;
   }
 
   newUpload(
@@ -29,8 +30,8 @@ class UploadController {
     onProgress: () => void = doNothing,
     onComplete: () => void = doNothing
   ): string {
-    const txnId = this.service.createTransaction();
-    const mediaIds = this.service.getTxnMediaIds(txnId);
+    const txnId = this.uploadService.createTransaction();
+    const mediaIds = this.uploadService.getTxnMediaIds(txnId);
 
     const txnFiles: FileEntries = {};
     const mediaFiles: FileType[] = [];
@@ -47,7 +48,7 @@ class UploadController {
 
     const txn = new UploadTransaction(txnId, mediaFiles);
 
-    const stopper = this.service.uploadFiles(
+    const stopper = this.uploadService.uploadFiles(
       txnId,
       files,
       (progresses) => {
@@ -69,9 +70,16 @@ class UploadController {
     return txnId;
   }
 
-  stopUpload(txnId: string): void {
-    this.txnEntries[txnId].transaction.stop();
-    this.txnEntries[txnId].stopper();
+  stopUpload(txnId: string): boolean {
+    const entry = this.txnEntries[txnId];
+
+    if (entry) {
+      this.txnEntries[txnId].transaction.stop();
+      this.txnEntries[txnId].stopper();
+      return true;
+    }
+
+    return false;
   }
 
   completeTxnPartially(txnId: string): void {
