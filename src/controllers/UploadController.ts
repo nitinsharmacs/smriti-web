@@ -82,27 +82,39 @@ class UploadController {
     return false;
   }
 
-  completeTxnPartially(txnId: string): void {
-    const txn = this.txnEntries[txnId].transaction;
+  completeTxnPartially(txnId: string): boolean {
+    const entry = this.txnEntries[txnId];
+
+    if (!entry) return false;
+
+    const txn = entry.transaction;
 
     if (!txn.anyFileUploaded()) {
       this.removeTransaction(txnId);
-      return;
+      return false;
     }
 
     txn.completePartially();
+    return true;
   }
 
   removeTransaction(txnId: string): boolean {
     return delete this.txnEntries[txnId];
   }
 
+  hasTransaction(txnId: string): boolean {
+    return txnId in this.txnEntries;
+  }
+
   getFailedTxnMediaFiles(txnId: string): FileList {
     const txnEntry = this.txnEntries[txnId];
 
+    const dataTransfer = new DataTransfer();
+
+    if (!txnEntry) return dataTransfer.files;
+
     const failedMediaIds: string[] = txnEntry.transaction.getFailedMediaIds();
 
-    const dataTransfer = new DataTransfer();
     failedMediaIds.forEach((id) => dataTransfer.items.add(txnEntry.files[id]));
 
     return dataTransfer.files;
