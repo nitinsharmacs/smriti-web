@@ -2,7 +2,6 @@ import Collapse from '@mui/material/Collapse';
 import { useRef } from 'react';
 import type { CollapsableMediaItemsProps } from 'src/components/MediaUploader/CollapsableMediaItems/types';
 import MediaItem from 'src/components/MediaUploader/MediaItem/MediaItem';
-import { MediaType, MediaUploadStatus } from '../types';
 
 import './collapsablemediaitems.css';
 
@@ -22,6 +21,7 @@ const CollapsableMediaItems = ({
         <div>
           {mediaItems.map((item) => (
             <MediaItem
+              key={item.id}
               name={item.name}
               type={item.type}
               status={item.status}

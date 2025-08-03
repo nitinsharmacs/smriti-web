@@ -1,0 +1,176 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CollapsableMediaItems > should render collapsable media items 1`] = `
+<div>
+  <div
+    class="collapsable-media-items"
+    style="margin-top: 1em;"
+  >
+    <div
+      class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-qr6njo-MuiCollapse-root"
+      style="min-height: 0px;"
+    >
+      <div
+        class="MuiCollapse-wrapper MuiCollapse-vertical css-1x6hinx-MuiCollapse-wrapper"
+      >
+        <div
+          class="MuiCollapse-wrapperInner MuiCollapse-vertical css-1i4ywhz-MuiCollapse-wrapperInner"
+        >
+          <div>
+            <div
+              class="upload-media-item"
+            >
+              <div
+                class="media-icon"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+                  data-testid="InsertPhotoOutlinedIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 5v14H5V5zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-4.86 8.86-3 3.87L9 13.14 6 17h12z"
+                  />
+                </svg>
+              </div>
+              <div
+                class="media-name"
+              >
+                image.png
+              </div>
+              <div
+                class="media-status"
+              >
+                <div
+                  class="circular-progressbar"
+                  style="position: relative; width: 20px; height: 20px;"
+                >
+                  <span
+                    aria-valuenow="100"
+                    class="MuiCircularProgress-root MuiCircularProgress-determinate MuiCircularProgress-colorPrimary circular-progressbar-bg css-10tu4h6-MuiCircularProgress-root"
+                    role="progressbar"
+                    style="width: 20px; height: 20px; transform: rotate(-90deg);"
+                  >
+                    <svg
+                      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+                      viewBox="22 22 44 44"
+                    >
+                      <circle
+                        class="MuiCircularProgress-circle MuiCircularProgress-circleDeterminate css-eorpq6-MuiCircularProgress-circle"
+                        cx="44"
+                        cy="44"
+                        fill="none"
+                        r="18"
+                        stroke-width="8"
+                        style="stroke-dasharray: 113.097; stroke-dashoffset: 0.000px;"
+                      />
+                    </svg>
+                  </span>
+                  <span
+                    aria-valuenow="12"
+                    class="MuiCircularProgress-root MuiCircularProgress-determinate MuiCircularProgress-colorPrimary circular-progressbar-stroke css-1mgn64i-MuiCircularProgress-root"
+                    role="progressbar"
+                    style="width: 20px; height: 20px; transform: rotate(-90deg);"
+                  >
+                    <svg
+                      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+                      viewBox="22 22 44 44"
+                    >
+                      <circle
+                        class="MuiCircularProgress-circle MuiCircularProgress-circleDeterminate MuiCircularProgress-circleDisableShrink css-eorpq6-MuiCircularProgress-circle"
+                        cx="44"
+                        cy="44"
+                        fill="none"
+                        r="18"
+                        stroke-width="8"
+                        style="stroke-dasharray: 113.097; stroke-dashoffset: 99.526px;"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="upload-media-item"
+            >
+              <div
+                class="media-icon"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+                  data-testid="VideocamOutlinedIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M15 8v8H5V8zm1-2H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4V7c0-.55-.45-1-1-1"
+                  />
+                </svg>
+              </div>
+              <div
+                class="media-name"
+              >
+                video.mp4
+              </div>
+              <div
+                class="media-status"
+              >
+                <div
+                  class="circular-progressbar"
+                  style="position: relative; width: 20px; height: 20px;"
+                >
+                  <span
+                    aria-valuenow="100"
+                    class="MuiCircularProgress-root MuiCircularProgress-determinate MuiCircularProgress-colorPrimary circular-progressbar-bg css-10tu4h6-MuiCircularProgress-root"
+                    role="progressbar"
+                    style="width: 20px; height: 20px; transform: rotate(-90deg);"
+                  >
+                    <svg
+                      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+                      viewBox="22 22 44 44"
+                    >
+                      <circle
+                        class="MuiCircularProgress-circle MuiCircularProgress-circleDeterminate css-eorpq6-MuiCircularProgress-circle"
+                        cx="44"
+                        cy="44"
+                        fill="none"
+                        r="18"
+                        stroke-width="8"
+                        style="stroke-dasharray: 113.097; stroke-dashoffset: 0.000px;"
+                      />
+                    </svg>
+                  </span>
+                  <span
+                    aria-valuenow="40"
+                    class="MuiCircularProgress-root MuiCircularProgress-determinate MuiCircularProgress-colorPrimary circular-progressbar-stroke css-1mgn64i-MuiCircularProgress-root"
+                    role="progressbar"
+                    style="width: 20px; height: 20px; transform: rotate(-90deg);"
+                  >
+                    <svg
+                      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+                      viewBox="22 22 44 44"
+                    >
+                      <circle
+                        class="MuiCircularProgress-circle MuiCircularProgress-circleDeterminate MuiCircularProgress-circleDisableShrink css-eorpq6-MuiCircularProgress-circle"
+                        cx="44"
+                        cy="44"
+                        fill="none"
+                        r="18"
+                        stroke-width="8"
+                        style="stroke-dasharray: 113.097; stroke-dashoffset: 67.858px;"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

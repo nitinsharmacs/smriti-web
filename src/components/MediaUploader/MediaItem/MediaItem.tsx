@@ -9,8 +9,7 @@ import { type MediaItemProps } from 'src/components/MediaUploader/MediaItem/type
 import { MediaType, MediaUploadStatus } from '../types';
 import './mediaitem.css';
 import { IconButton } from '@mui/material';
-
-const doNothing = () => {};
+import { doNothing } from 'src/helpers';
 
 const MediaStatus = (
   status: MediaUploadStatus,
