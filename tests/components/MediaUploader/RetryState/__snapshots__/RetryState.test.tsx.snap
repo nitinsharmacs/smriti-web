@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`InProgressState > should render progress state 1`] = `
+exports[`RetryState > should render retry state 1`] = `
 <div>
   <div
     class="upload-txn-modal"
@@ -11,33 +11,15 @@ exports[`InProgressState > should render progress state 1`] = `
       <div
         class="content"
       >
-        <h4>
-          Media getting uploaded
-        </h4>
-        <div
-          class="upload-progressbar"
+        <h4
+          class="retry-modal-heading"
         >
-          <span
-            aria-valuemax="100"
-            aria-valuemin="0"
-            aria-valuenow="0"
-            class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate progressbar css-16mo9zg-MuiLinearProgress-root"
-            role="progressbar"
-          >
-            <span
-              class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-l16vtb-MuiLinearProgress-bar1"
-              style="transform: translateX(-100%);"
-            />
-          </span>
-          <div
-            class="items-completion-indicator"
-          >
-            0
-             of 
-            2
-             done
-          </div>
-        </div>
+          0
+           out of
+           
+          0
+           uploads remaining
+        </h4>
       </div>
       <div
         class="actions"
@@ -47,7 +29,7 @@ exports[`InProgressState > should render progress state 1`] = `
           tabindex="0"
           type="button"
         >
-          Stop
+          Retry
         </button>
         <button
           class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary text-btn css-1uent87-MuiButtonBase-root-MuiButton-root"

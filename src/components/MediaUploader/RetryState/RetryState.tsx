@@ -1,40 +1,35 @@
-import { useCallback, useState } from 'react';
-
 import Button from 'src/components/Button/Button';
 import Modal from 'src/components/MediaUploader/Modal/Modal';
-import CollapsableMediaItems from 'src/components/MediaUploader/CollapsableMediaItems/CollapsableMediaItems';
-
-import './styles.css';
+import ExpandableModal from 'src/components/MediaUploader/ExpandableModal/ExpandableModal';
+import MediaItem from 'src/components/MediaUploader/MediaItem/MediaItem';
 import type { RetryStateProps } from 'src/components/MediaUploader/RetryState/types';
 
+import './styles.css';
+
 const RetryState = (props: RetryStateProps) => {
-  const [showMore, setShowMore] = useState<boolean>(false);
-
-  const showMoreHandler = useCallback(() => {
-    setShowMore((prev) => !prev);
-  }, []);
-
   return (
     <Modal>
-      <div className='retry-modal'>
+      <ExpandableModal
+        expandableContent={props.mediaItems.map((item) => (
+          <MediaItem
+            key={item.id}
+            name={item.name}
+            type={item.type}
+            status={item.status}
+            progress={item.progress}
+          />
+        ))}
+        actions={[
+          <Button key='retry-btn' variant='contained' onClick={props.onRetry}>
+            Retry
+          </Button>,
+        ]}
+      >
         <h4 className='retry-modal-heading'>
           {props.targetUploads - props.achievedUploads} out of{' '}
-          {props.targetUploads} unfinished upload
+          {props.targetUploads} uploads remaining
         </h4>
-        <div className='retry-controls'>
-          <Button variant='contained' onClick={props.onRetry}>
-            Retry
-          </Button>
-          <Button
-            variant='text'
-            onClick={showMoreHandler}
-            style={{ marginLeft: '0.5em' }}
-          >
-            Show more
-          </Button>
-        </div>
-        <CollapsableMediaItems mediaItems={props.mediaItems} open={showMore} />
-      </div>
+      </ExpandableModal>
     </Modal>
   );
 };

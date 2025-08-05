@@ -1,9 +1,3 @@
-.upload-in-progress {
-  max-height: 300px;
-  display: flex;
-  flex-direction: column;
-}
-
 .upload-progressbar {
   margin-top: 1.5em;
 }

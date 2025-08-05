@@ -1,24 +1,36 @@
-import { useCallback, useState } from 'react';
-
 import ProgressBar from 'src/components/ProgressBar/ProgressBar';
 
 import Button from 'src/components/Button/Button';
 import Modal from 'src/components/MediaUploader/Modal/Modal';
-import CollapsableMediaItems from 'src/components/MediaUploader/CollapsableMediaItems/CollapsableMediaItems';
 
 import './styles.css';
 import type { InProgressStateProps } from './types';
+import MediaItem from 'src/components/MediaUploader/MediaItem/MediaItem';
+import ExpandableModal from 'src/components/MediaUploader/ExpandableModal/ExpandableModal';
 
 const InProgressState = (props: InProgressStateProps) => {
-  const [showMore, setShowMore] = useState<boolean>(false);
-
-  const showMoreHandler = useCallback(() => {
-    setShowMore((prev) => !prev);
-  }, []);
-
   return (
     <Modal>
-      <div className='upload-in-progress'>
+      <ExpandableModal
+        expandableContent={props.mediaItems.map((item) => (
+          <MediaItem
+            key={item.id}
+            name={item.name}
+            type={item.type}
+            status={item.status}
+            progress={item.progress}
+          />
+        ))}
+        actions={[
+          <Button
+            key='progress-stop-btn'
+            variant='contained'
+            onClick={props.onStop}
+          >
+            Stop
+          </Button>,
+        ]}
+      >
         <h4>Media getting uploaded</h4>
         <div className='upload-progressbar'>
           <ProgressBar
@@ -29,20 +41,7 @@ const InProgressState = (props: InProgressStateProps) => {
             {props.achievedUploads} of {props.targetUploads} done
           </div>
         </div>
-        <div className='upload-controls'>
-          <Button variant='contained' onClick={props.onStop}>
-            Stop
-          </Button>
-          <Button
-            variant='text'
-            onClick={showMoreHandler}
-            style={{ marginLeft: '0.5em' }}
-          >
-            {showMore ? 'Show less' : 'Show more'}
-          </Button>
-        </div>
-        <CollapsableMediaItems mediaItems={props.mediaItems} open={showMore} />
-      </div>
+      </ExpandableModal>
     </Modal>
   );
 };

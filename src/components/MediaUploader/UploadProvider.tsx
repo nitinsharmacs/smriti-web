@@ -58,6 +58,7 @@ const UploadProvider = ({ children }: ProviderProps) => {
         <UploadContainer>
           {transactions.map((txn) => (
             <UploadTxn
+              key={txn.txnId}
               txnId={txn.txnId}
               status={txn.status}
               state={txn.state}

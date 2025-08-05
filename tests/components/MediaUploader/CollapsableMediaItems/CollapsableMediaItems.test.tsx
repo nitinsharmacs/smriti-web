@@ -1,35 +1,25 @@
-import { render } from '@testing-library/react';
-import CollapsableMediaItems from 'src/components/MediaUploader/CollapsableMediaItems/CollapsableMediaItems';
-import {
-  MediaType,
-  MediaUploadStatus,
-} from 'src/components/MediaUploader/types';
+import { render, screen } from '@testing-library/react';
+import CollapsableList from 'src/components/CollapsableList/CollapsableList';
 import { describe, expect, it } from 'vitest';
 
 describe('CollapsableMediaItems', () => {
-  it('should render collapsable media items', () => {
-    const { container } = render(
-      <CollapsableMediaItems
-        open={true}
-        mediaItems={[
-          {
-            id: '123',
-            type: MediaType.Image,
-            status: MediaUploadStatus.InProgress,
-            progress: 12,
-            name: 'image.png',
-          },
-          {
-            id: '1234',
-            type: MediaType.Video,
-            status: MediaUploadStatus.InProgress,
-            progress: 40,
-            name: 'video.mp4',
-          },
-        ]}
-      />
+  it('should open collapsable content', async () => {
+    render(
+      <CollapsableList open={true}>
+        <div>hello world</div>
+      </CollapsableList>
     );
 
-    expect(container).toMatchSnapshot();
+    expect(await screen.findByText('hello world')).toBeInTheDocument();
+  });
+
+  it('should close collapsable content', () => {
+    render(
+      <CollapsableList open={false}>
+        <div>hello world</div>
+      </CollapsableList>
+    );
+
+    expect(screen.queryByText('hello world')).not.toBeInTheDocument();
   });
 });

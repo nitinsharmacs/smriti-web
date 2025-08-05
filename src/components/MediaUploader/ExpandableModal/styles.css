@@ -1,0 +1,9 @@
+.expandable-modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+}
+
+.expandable-content {
+  overflow-y: auto;
+}

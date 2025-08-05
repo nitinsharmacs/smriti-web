@@ -55,7 +55,7 @@ class UploadService {
   }
 
   getTxnMediaIds(txnId: string): string[] {
-    return ['txn1-media1-1', 'txn1-media1-2', 'txn1-media1-1'];
+    return ['txn1-media1-1', 'txn1-media1-2', 'txn1-media1-3'];
   }
 }
 
