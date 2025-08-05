@@ -38,7 +38,7 @@ const InProgressState = (props: InProgressStateProps) => {
             onClick={showMoreHandler}
             style={{ marginLeft: '0.5em' }}
           >
-            Show more
+            {showMore ? 'Show less' : 'Show more'}
           </Button>
         </div>
         <CollapsableMediaItems mediaItems={props.mediaItems} open={showMore} />
