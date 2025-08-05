@@ -1,0 +1,112 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CompleteState > should render complete state 1`] = `
+<div>
+  <div
+    class="upload-txn-modal"
+  >
+    <div
+      class="upload-complete-modal"
+    >
+      <div
+        class="upload-complete-content"
+      >
+        <h4>
+          Upload completed
+        </h4>
+        <div
+          class="upload-summary"
+        >
+          2
+           of 
+          2
+           files uploaded successfully.
+          <br />
+          Please click 
+          <b>
+            Complete
+          </b>
+           to store permanently.
+        </div>
+        <div
+          class="complete-controls"
+        >
+          <button
+            class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary contained-btn css-74d805-MuiButtonBase-root-MuiButton-root"
+            tabindex="0"
+            type="button"
+          >
+            Complete
+          </button>
+        </div>
+      </div>
+      <div
+        class="upload-preview"
+      >
+        <figure>
+          <img
+            alt="upload-preview"
+            src="/preview"
+          />
+        </figure>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`CompleteState > should render partially complete state 1`] = `
+<div>
+  <div
+    class="upload-txn-modal"
+  >
+    <div
+      class="upload-complete-modal"
+    >
+      <div
+        class="upload-complete-content"
+      >
+        <h4>
+          Upload completed
+           partially
+        </h4>
+        <div
+          class="upload-summary"
+        >
+          1
+           of 
+          2
+           files uploaded successfully.
+          <br />
+          Please click 
+          <b>
+            Complete
+          </b>
+           to store permanently.
+        </div>
+        <div
+          class="complete-controls"
+        >
+          <button
+            class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary contained-btn css-74d805-MuiButtonBase-root-MuiButton-root"
+            tabindex="0"
+            type="button"
+          >
+            Complete
+          </button>
+        </div>
+      </div>
+      <div
+        class="upload-preview"
+      >
+        <figure>
+          <img
+            alt="upload-preview"
+            src="/preview"
+          />
+        </figure>
+      </div>
+    </div>
+  </div>
+</div>
+`;
