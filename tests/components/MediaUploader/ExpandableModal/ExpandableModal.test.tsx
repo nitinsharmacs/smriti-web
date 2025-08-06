@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ExpandableModal from 'src/components/MediaUploader/ExpandableModal/ExpandableModal';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('Expandable Modal', () => {
   it('should have content', async () => {

@@ -1,13 +1,24 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import UploadContainer from 'src/components/MediaUploader/UploadContainer/UploadContainer';
-import UploadTxn from 'src/components/MediaUploader/UploadTxn/UploadTxn';
 import UploadController from 'src/controllers/UploadController';
 import UploadService from 'src/services/UploadService';
-import UploadContext from './UploadContext';
 
-import type { UploadTxnControl } from 'src/components/MediaUploader/UploadTxn/types';
-import type { ProviderProps, UploadTxnCreator, UploadTxnType } from './types';
+import UploadContainer from './UploadContainer/UploadContainer';
+import UploadTxn from './UploadTxn/UploadTxn';
+
+import type { UploadTxnControl } from './UploadTxn/types';
+import type {
+  ProviderContext,
+  ProviderProps,
+  UploadTxnCreator,
+  UploadTxnType,
+} from './types';
+import React from 'react';
+import { doNothing } from 'src/helpers';
+
+export const UploadContext = React.createContext<ProviderContext>({
+  createUploadTxn: doNothing,
+});
 
 export let createUploadTxn: UploadTxnCreator;
 
@@ -52,7 +63,7 @@ const UploadProvider = ({ children }: ProviderProps) => {
   createUploadTxn = createUploadTxnHandler;
 
   return (
-    <UploadContext value={{ createUploadTxn: createUploadTxnHandler }}>
+    <UploadContext.Provider value={{ createUploadTxn: createUploadTxnHandler }}>
       {children}
       {
         <UploadContainer>
@@ -69,7 +80,7 @@ const UploadProvider = ({ children }: ProviderProps) => {
           ))}
         </UploadContainer>
       }
-    </UploadContext>
+    </UploadContext.Provider>
   );
 };
 

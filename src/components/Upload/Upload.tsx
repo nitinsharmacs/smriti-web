@@ -2,7 +2,7 @@ import UploadIcon from '@mui/icons-material/Upload';
 import { Button, IconButton } from '@mui/material';
 
 import './upload.css';
-import { createUploadTxn } from 'src/components/MediaUploader/UploadProvider';
+import { createUploadTxn } from 'src/components/MediaUploader/UploadContext';
 
 const Upload = () => {
   const file1 = new File(['Hello world'], 'hello.txt', {

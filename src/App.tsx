@@ -1,6 +1,6 @@
 import Layout from 'src/components/Layout/Layout';
 import './App.css';
-import UploadProvider from 'src/components/MediaUploader/UploadProvider';
+import UploadProvider from 'src/components/MediaUploader/UploadContext';
 import Photos from 'src/screens/Photos/Photos';
 
 function App() {
