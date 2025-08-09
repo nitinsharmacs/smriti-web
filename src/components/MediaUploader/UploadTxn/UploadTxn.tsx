@@ -13,8 +13,6 @@ import { useCallback } from 'react';
 
 const UploadTxn = (props: UploadTxnProps) => {
   const onStopHandler = useCallback(() => {
-    console.log(props.txnId);
-
     props.onStop(props.txnId);
   }, [props.txnId]);
 
