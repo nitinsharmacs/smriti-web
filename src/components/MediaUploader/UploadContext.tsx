@@ -34,11 +34,18 @@ const UploadProvider = ({ children }: ProviderProps) => {
     updateTxn(uploadController.getTransactions());
   }, []);
 
-  const createUploadTxnHandler = useCallback<UploadTxnCreator>((files) => {
-    uploadController.newUpload(files, updateTransactions, updateTransactions);
+  const createUploadTxnHandler = useCallback<UploadTxnCreator>(
+    async (files) => {
+      await uploadController.newUpload(
+        files,
+        updateTransactions,
+        updateTransactions
+      );
 
-    updateTransactions();
-  }, []);
+      updateTransactions();
+    },
+    []
+  );
 
   const completeTxnHandler = useCallback<UploadTxnControl>((txnId) => {
     console.log('complete transaction, ', txnId);

@@ -8,13 +8,16 @@
 }
 
 .media-icon,
-.media-name,
 .media-status {
   line-height: 0;
 }
 
 .media-name {
-  margin-left: 1em;
+  margin: 0 1em 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
 }
 
 .media-status {

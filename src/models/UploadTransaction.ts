@@ -10,6 +10,10 @@ import {
   type UploadTxnType,
 } from 'src/components/MediaUploader/types';
 
+export type ProgressStats = {
+  [key: string]: number;
+};
+
 export type FileType = {
   id: string;
   name: string;
@@ -66,12 +70,12 @@ class UploadTransaction {
     };
   }
 
-  updateMediaProgresses(progresses: number[]): void {
+  updateMediaProgresses(progresses: ProgressStats): void {
     const state = this.txnState as InProgressStateType;
 
-    state.mediaItems.forEach((item, index) => {
+    state.mediaItems.forEach((item) => {
       if (item.progress === 100) return;
-      item.progress = Math.min(100, progresses[index]);
+      item.progress = Math.min(100, progresses[item.id]);
 
       if (item.progress === 100) {
         item.status = MediaUploadStatus.Success;

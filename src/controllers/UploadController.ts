@@ -1,7 +1,7 @@
 import { type UploadTxnType } from 'src/components/MediaUploader/types';
 import { doNothing } from 'src/helpers';
 import UploadTransaction, { type FileType } from 'src/models/UploadTransaction';
-import UploadService from 'src/services/UploadService';
+import UploadService, { type FileItem } from 'src/services/UploadService';
 
 type FileEntries = {
   [key: string]: File;
@@ -25,16 +25,18 @@ class UploadController {
     this.uploadService = uploadService;
   }
 
-  newUpload(
+  async newUpload(
     files: FileList,
     onProgress: () => void = doNothing,
     onComplete: () => void = doNothing
-  ): string {
-    const txnId = this.uploadService.createTransaction();
-    const mediaIds = this.uploadService.getTxnMediaIds(txnId);
+  ): Promise<string> {
+    const { txnId, mediaIds } = await this.uploadService.createTransaction(
+      files.length
+    );
 
     const txnFiles: FileEntries = {};
     const mediaFiles: FileType[] = [];
+    const fileItems: FileItem[] = [];
 
     [...files].forEach((file, index) => {
       mediaFiles.push({
@@ -44,13 +46,14 @@ class UploadController {
       });
 
       txnFiles[mediaIds[index]] = file;
+      fileItems.push({ id: mediaIds[index], file });
     });
 
     const txn = new UploadTransaction(txnId, mediaFiles);
 
     const stopper = this.uploadService.uploadFiles(
       txnId,
-      files,
+      fileItems,
       (progresses) => {
         txn.updateMediaProgresses(progresses);
         onProgress();

@@ -1,61 +1,114 @@
-const deltas = (count: number) => {
-  const items = [];
-  let del = 10;
-  for (let start = 0; start < count; start++) {
-    items.push(del);
-    del += 20;
-  }
-  return items;
+import { BASE_URL } from 'src/constants';
+import type { Transaction } from 'src/dao/Upload';
+import type { ProgressStats } from 'src/models/UploadTransaction';
+
+export type FileItem = {
+  id: string;
+  file: File;
 };
+
+export class FileUploader {
+  private txnId: string;
+  private files: FileItem[];
+  private req_map: { [key: string]: XMLHttpRequest } = {};
+
+  private _progresses: ProgressStats = {};
+
+  constructor(txnId: string, files: FileItem[]) {
+    this.txnId = txnId;
+    this.files = files;
+  }
+
+  start() {
+    this.files.forEach((file) => {
+      const req = new XMLHttpRequest();
+
+      const formData = new FormData();
+      formData.append('txnId', this.txnId);
+      formData.append('mediaId', file.id);
+      formData.append('file', file.file);
+
+      req.upload.addEventListener('progress', (event: ProgressEvent) => {
+        this._progresses[file.id] = Math.floor(
+          (event.loaded / event.total) * 100
+        );
+      });
+
+      req.upload.addEventListener('abort', () => {
+        console.log('Aborted upload for file ', file.file.name);
+      });
+
+      req.open('POST', BASE_URL + '/upload');
+
+      req.send(formData);
+
+      this.req_map[file.id] = req;
+    });
+  }
+
+  stop() {
+    Object.values(this.req_map).forEach((req) => req.abort());
+  }
+
+  finished(): boolean {
+    return Object.values(this._progresses).every((progress) => progress >= 100);
+  }
+
+  get progresses() {
+    return this._progresses;
+  }
+}
 
 class UploadService {
   private interval: number | undefined;
-  private timeout: number | undefined;
-
-  private txnIds = ['txn1', 'txn2', 'txn3'];
-  private usingIndex: number = 0;
 
   constructor() {}
 
   uploadFiles(
     txnId: string,
-    files: FileList,
-    onProgress: (progresses: number[]) => void,
+    files: FileItem[],
+    onProgress: (progresses: ProgressStats) => void,
     onComplete: () => void
   ): () => void {
-    // upload and return some progressor
-
-    let progresses = new Array(files.length).fill(0);
-
-    const steps = deltas(files.length);
+    const upload = new FileUploader(txnId, files);
+    upload.start();
 
     this.interval = setInterval(() => {
-      progresses = progresses.map((p, i) => {
-        const progress = p + steps[i];
-        if (progress > 100) return 100;
-        return progress;
-      });
-      onProgress(progresses);
-    }, 1500);
+      if (upload.finished()) {
+        onProgress(upload.progresses);
+        onComplete();
+        return clearInterval(this.interval);
+      }
 
-    setTimeout(() => {
-      clearInterval(this.interval);
-
-      onComplete();
-    }, 15000);
+      onProgress(upload.progresses);
+    }, 100);
 
     return () => {
       clearInterval(this.interval);
-      clearTimeout(this.timeout);
+      upload.stop();
     };
   }
 
-  createTransaction(): string {
-    return this.txnIds[this.usingIndex++];
-  }
-
-  getTxnMediaIds(txnId: string): string[] {
-    return ['txn1-media1-1', 'txn1-media1-2', 'txn1-media1-3'];
+  async createTransaction(mediaCount: number): Promise<Transaction> {
+    return fetch(BASE_URL + '/create-upload-txn', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ mediaCount }),
+    })
+      .then((res) => {
+        if (res.status !== 200) {
+          throw new Error('txn creation failed');
+        }
+        return res.json();
+      })
+      .then((res) => {
+        return {
+          txnId: res.txnId,
+          mediaIds: res.mediaIds,
+        };
+      });
   }
 }
 

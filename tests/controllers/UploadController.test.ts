@@ -52,11 +52,12 @@ const it = baseIt.extend<{
     const serviceMock = vi.fn();
     serviceMock.prototype.createTransaction = vi.fn();
 
-    serviceMock.prototype.getTxnMediaIds = vi.fn();
     serviceMock.prototype.uploadFiles = vi.fn();
 
-    serviceMock.prototype.createTransaction.mockReturnValue('txn1');
-    serviceMock.prototype.getTxnMediaIds.mockReturnValue([1, 2, 3]);
+    serviceMock.prototype.createTransaction.mockReturnValue({
+      txnId: 'txn1',
+      mediaIds: ['media1', 'media2', 'media3'],
+    });
 
     const controller = new UploadController(new serviceMock());
     await use({ controller, serviceMock });
@@ -71,6 +72,7 @@ const it = baseIt.extend<{
 
     const fileListMock = {
       [Symbol.iterator]: () => ({ next: mockNext }),
+      length: 3,
     } as unknown as FileList;
 
     await use({ mockNext, fileList: fileListMock });
@@ -82,38 +84,40 @@ describe('UploadController', () => {
     vi.clearAllMocks();
   });
 
-  it('should upload files', ({ getController, mockFileList }) => {
+  it('should upload files', async ({ getController, mockFileList }) => {
     const controller = getController.controller;
 
     const serviceMock = getController.serviceMock;
 
-    const result = controller.newUpload(mockFileList.fileList);
+    const result = await controller.newUpload(mockFileList.fileList);
 
     expect(result).toBe('txn1');
 
     expect(mockFileList.mockNext).toBeCalledTimes(4);
 
     expect(UploadTransaction).toHaveBeenCalledExactlyOnceWith('txn1', [
-      { type: 'text/plain', name: 'hello.txt', id: 1 },
-      { type: 'text/plain', name: 'hello2.txt', id: 2 },
-      { type: 'image/png', name: 'hello3.png', id: 3 },
+      { type: 'text/plain', name: 'hello.txt', id: 'media1' },
+      { type: 'text/plain', name: 'hello2.txt', id: 'media2' },
+      { type: 'image/png', name: 'hello3.png', id: 'media3' },
     ]);
 
-    expect(serviceMock.prototype.createTransaction).toHaveBeenCalledOnce();
-
     expect(
-      serviceMock.prototype.getTxnMediaIds
-    ).toHaveBeenCalledExactlyOnceWith('txn1');
+      serviceMock.prototype.createTransaction
+    ).toHaveBeenCalledExactlyOnceWith(3);
 
     expect(serviceMock.prototype.uploadFiles).toHaveBeenCalledExactlyOnceWith(
       'txn1',
-      mockFileList.fileList,
+      [
+        { id: 'media1', file: file1 },
+        { id: 'media2', file: file2 },
+        { id: 'media3', file: file3 },
+      ],
       expect.any(Function),
       expect.any(Function)
     );
   });
 
-  it('should call progress handler in new upload', ({
+  it('should call progress handler in new upload', async ({
     getController,
     mockFileList,
   }) => {
@@ -128,7 +132,7 @@ describe('UploadController', () => {
 
     const onProgressMock = vi.fn();
 
-    controller.newUpload(mockFileList.fileList, onProgressMock);
+    await controller.newUpload(mockFileList.fileList, onProgressMock);
 
     expect(updateMediaProgressesMock).toHaveBeenCalledExactlyOnceWith([
       1, 2, 3,
@@ -136,7 +140,7 @@ describe('UploadController', () => {
     expect(onProgressMock).toHaveBeenCalledOnce();
   });
 
-  it('should call complete handler in new upload', ({
+  it('should call complete handler in new upload', async ({
     getController,
     mockFileList,
   }) => {
@@ -151,19 +155,19 @@ describe('UploadController', () => {
 
     const onCompleteMock = vi.fn();
 
-    controller.newUpload(mockFileList.fileList, vi.fn(), onCompleteMock);
+    await controller.newUpload(mockFileList.fileList, vi.fn(), onCompleteMock);
 
     expect(completeMock).toHaveBeenCalledOnce();
     expect(onCompleteMock).toHaveBeenCalledOnce();
   });
 
-  it('should stop an upload', ({ getController, mockFileList }) => {
+  it('should stop an upload', async ({ getController, mockFileList }) => {
     const controller = getController.controller;
     const serviceMock = getController.serviceMock;
 
     const stopperMock = vi.fn();
     serviceMock.prototype.uploadFiles.mockReturnValue(stopperMock);
-    controller.newUpload(mockFileList.fileList);
+    await controller.newUpload(mockFileList.fileList);
 
     expect(controller.stopUpload('txn1')).toBe(true);
 
@@ -178,13 +182,13 @@ describe('UploadController', () => {
     expect(controller.stopUpload('txn1')).toBe(false);
   });
 
-  it('should complete a transaction partially', ({
+  it('should complete a transaction partially', async ({
     getController,
     mockFileList,
   }) => {
     const controller = getController.controller;
 
-    controller.newUpload(mockFileList.fileList);
+    await controller.newUpload(mockFileList.fileList);
 
     anyFileUploadedMock.mockReturnValue(true);
 
@@ -192,13 +196,13 @@ describe('UploadController', () => {
     expect(completePartiallyMock).toHaveBeenCalledOnce();
   });
 
-  it('should delete the transaction on partial completion of media uploads', ({
+  it('should delete the transaction on partial completion of media uploads', async ({
     getController,
     mockFileList,
   }) => {
     const controller = getController.controller;
 
-    controller.newUpload(mockFileList.fileList);
+    await controller.newUpload(mockFileList.fileList);
 
     anyFileUploadedMock.mockReturnValue(false);
 
@@ -208,28 +212,31 @@ describe('UploadController', () => {
     expect(removeTransactionMock).toBeCalledTimes(1);
   });
 
-  it('should do nothing if txn entry missing for partial complete', ({
+  it('should do nothing if txn entry missing for partial complete', async ({
     getController,
     mockFileList,
   }) => {
     const controller = getController.controller;
 
-    controller.newUpload(mockFileList.fileList);
+    await controller.newUpload(mockFileList.fileList);
 
     expect(controller.completeTxnPartially('txn1')).toBe(false);
     expect(completePartiallyMock).toBeCalledTimes(0);
   });
 
-  it('should remove transaction', ({ getController, mockFileList }) => {
+  it('should remove transaction', async ({ getController, mockFileList }) => {
     const controller = getController.controller;
 
-    controller.newUpload(mockFileList.fileList);
+    await controller.newUpload(mockFileList.fileList);
 
     expect(controller.removeTransaction('txn1')).toBe(true);
     expect(controller.hasTransaction('txn1')).toBe(false);
   });
 
-  it('should get failed txn media files', ({ getController, mockFileList }) => {
+  it('should get failed txn media files', async ({
+    getController,
+    mockFileList,
+  }) => {
     const itemsAddMock = vi.fn();
     const DataTransferMock = vi.fn().mockImplementation(() => {
       return {
@@ -244,7 +251,7 @@ describe('UploadController', () => {
 
     const controller = getController.controller;
 
-    controller.newUpload(mockFileList.fileList);
+    await controller.newUpload(mockFileList.fileList);
 
     getFailedMediaIdsMock.mockReturnValue([2, 3]);
 
@@ -271,10 +278,13 @@ describe('UploadController', () => {
     expect(getFailedMediaIdsMock).toBeCalledTimes(0);
   });
 
-  it('should get transaction objects', ({ getController, mockFileList }) => {
+  it('should get transaction objects', async ({
+    getController,
+    mockFileList,
+  }) => {
     const controller = getController.controller;
 
-    controller.newUpload(mockFileList.fileList);
+    await controller.newUpload(mockFileList.fileList);
 
     const expected = ['transaction'];
 

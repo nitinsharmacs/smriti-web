@@ -155,12 +155,16 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    const progresses = [10, 20, 30];
+    const progresses = {
+      'txn1-media-1': 10,
+      'txn1-media-2': 20,
+      'txn1-media-3': 30,
+    };
     txn.updateMediaProgresses(progresses);
     const state = txn.state as InProgressStateType;
 
     const actual = state.mediaItems.map((item) => item.progress);
-    expect(actual).toStrictEqual(progresses);
+    expect(actual).toStrictEqual([10, 20, 30]);
   });
 
   it('should correctly update media progress if exceeds 100', ({
@@ -169,7 +173,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    const progresses = [10, 20, 130];
+    const progresses = {
+      'txn1-media-1': 10,
+      'txn1-media-2': 20,
+      'txn1-media-3': 130,
+    };
     txn.updateMediaProgresses(progresses);
     const state = txn.state as InProgressStateType;
 
@@ -181,14 +189,22 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    txn.updateMediaProgresses([10, 20, 100]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 10,
+      'txn1-media-2': 20,
+      'txn1-media-3': 100,
+    });
 
     const state = txn.state as InProgressStateType;
     const actual1 = state.mediaItems.map((item) => item.progress);
 
     expect(actual1).toStrictEqual([10, 20, 100]);
 
-    txn.updateMediaProgresses([10, 20, 10]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 10,
+      'txn1-media-2': 20,
+      'txn1-media-3': 10,
+    });
     const newState = txn.state as InProgressStateType;
     const actual2 = newState.mediaItems.map((item) => item.progress);
 
@@ -201,7 +217,11 @@ describe('UploadTransaction', () => {
 
     expect(txn.state.achievedUploads).toStrictEqual(0);
 
-    const progresses = [10, 20, 100];
+    const progresses = {
+      'txn1-media-1': 10,
+      'txn1-media-2': 20,
+      'txn1-media-3': 100,
+    };
     txn.updateMediaProgresses(progresses);
 
     expect(txn.state.achievedUploads).toStrictEqual(1);
@@ -219,7 +239,11 @@ describe('UploadTransaction', () => {
       MediaUploadStatus.InProgress
     );
 
-    txn.updateMediaProgresses([10, 20, 100]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 10,
+      'txn1-media-2': 20,
+      'txn1-media-3': 100,
+    });
 
     const newState = txn.state as InProgressStateType;
     expect(newState.mediaItems[2].status).toStrictEqual(
@@ -280,7 +304,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    txn.updateMediaProgresses([100, 100, 100]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 100,
+      'txn1-media-2': 100,
+      'txn1-media-3': 100,
+    });
 
     const completedState: CompletedStateType = {
       achievedUploads: 3,
@@ -299,7 +327,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    txn.updateMediaProgresses([100, 100, 90]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 100,
+      'txn1-media-2': 100,
+      'txn1-media-3': 90,
+    });
 
     const expected: InProgressStateType = {
       targetUploads: 3,
@@ -338,7 +370,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    txn.updateMediaProgresses([100, 100, 90]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 100,
+      'txn1-media-2': 100,
+      'txn1-media-3': 90,
+    });
 
     expect(txn.complete()).toBe(false);
     expect(txn.status).toBe(UploadTxnStatus.InProgress);
@@ -348,7 +384,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    txn.updateMediaProgresses([100, 100, 90]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 100,
+      'txn1-media-2': 100,
+      'txn1-media-3': 90,
+    });
     txn.stop(); // putting in retry state
 
     const expected: CompletedStateType = {
@@ -368,7 +408,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    txn.updateMediaProgresses([100, 100, 90]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 100,
+      'txn1-media-2': 100,
+      'txn1-media-3': 90,
+    });
 
     expect(txn.completePartially()).toBe(false);
     expect(txn.status).toBe(UploadTxnStatus.InProgress);
@@ -378,7 +422,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    txn.updateMediaProgresses([100, 100, 90]);
+    txn.updateMediaProgresses({
+      'txn1-media-1': 100,
+      'txn1-media-2': 100,
+      'txn1-media-3': 90,
+    });
 
     const expected: UploadTxnType = {
       txnId: 'txn1',
@@ -418,7 +466,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    const progresses = [10, 100, 30];
+    const progresses = {
+      'txn1-media-1': 10,
+      'txn1-media-2': 100,
+      'txn1-media-3': 30,
+    };
     txn.updateMediaProgresses(progresses);
     txn.stop();
 
@@ -432,7 +484,11 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    const progresses = [10, 100, 30];
+    const progresses = {
+      'txn1-media-1': 10,
+      'txn1-media-2': 100,
+      'txn1-media-3': 30,
+    };
     txn.updateMediaProgresses(progresses);
 
     expect(txn.getFailedMediaIds()).toStrictEqual([]);

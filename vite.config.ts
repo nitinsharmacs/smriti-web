@@ -1,19 +1,25 @@
-import { defineConfig, type UserConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig, type UserConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      src: '/src'
-    }
-  }, 
+      src: '/src',
+    },
+  },
   test: {
     environment: 'jsdom',
-    setupFiles: "./tests/setup.ts"
+    setupFiles: './tests/setup.ts',
   },
   server: {
-    port: 8080
-  }
-} as UserConfig)
+    port: 8080,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000/',
+        changeOrigin: true,
+      },
+    },
+  },
+} as UserConfig);
