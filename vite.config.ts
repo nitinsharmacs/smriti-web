@@ -12,6 +12,18 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: './tests/setup.ts',
+    coverage: {
+      provider: 'istanbul',
+      enabled: false,
+      include: ['src/**/*.{ts,tsx}'],
+      reporter: ['html', 'text'],
+      threshold: {
+        statements: 100,
+        branches: 100,
+        functions: 100,
+        lines: 100,
+      },
+    },
   },
   server: {
     port: 8080,
