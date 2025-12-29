@@ -1,68 +1,15 @@
-import { BASE_URL } from 'src/constants';
 import type { Transaction } from 'src/dao/Upload';
 import type { ProgressStats } from 'src/models/UploadTransaction';
-
-export type FileItem = {
-  id: string;
-  file: File;
-};
-
-export class FileUploader {
-  private txnId: string;
-  private files: FileItem[];
-  private req_map: { [key: string]: XMLHttpRequest } = {};
-
-  private _progresses: ProgressStats = {};
-
-  constructor(txnId: string, files: FileItem[]) {
-    this.txnId = txnId;
-    this.files = files;
-  }
-
-  start() {
-    this.files.forEach((file) => {
-      const req = new XMLHttpRequest();
-
-      const formData = new FormData();
-      formData.append('txnId', this.txnId);
-      formData.append('mediaId', file.id);
-      formData.append('file', file.file);
-
-      req.upload.addEventListener('progress', (event: ProgressEvent) => {
-        this._progresses[file.id] = Math.floor(
-          (event.loaded / event.total) * 100
-        );
-      });
-
-      req.upload.addEventListener('abort', () => {
-        console.log('Aborted upload for file ', file.file.name);
-      });
-
-      req.open('POST', BASE_URL + '/upload');
-
-      req.send(formData);
-
-      this.req_map[file.id] = req;
-    });
-  }
-
-  stop() {
-    Object.values(this.req_map).forEach((req) => req.abort());
-  }
-
-  finished(): boolean {
-    return Object.values(this._progresses).every((progress) => progress >= 100);
-  }
-
-  get progresses() {
-    return this._progresses;
-  }
-}
+import FileUploader from './FileUploader';
+import type { FileItem } from './types';
 
 class UploadService {
   private interval: number | undefined;
+  private baseUrl: string;
 
-  constructor() {}
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
 
   uploadFiles(
     txnId: string,
@@ -71,16 +18,16 @@ class UploadService {
     onComplete: () => void
   ): () => void {
     const upload = new FileUploader(txnId, files);
-    upload.start();
+
+    upload.start(this.baseUrl + '/upload/upload');
 
     this.interval = setInterval(() => {
+      onProgress(upload.progresses);
+
       if (upload.finished()) {
-        onProgress(upload.progresses);
         onComplete();
         return clearInterval(this.interval);
       }
-
-      onProgress(upload.progresses);
     }, 100);
 
     return () => {
@@ -90,7 +37,7 @@ class UploadService {
   }
 
   async createTransaction(mediaCount: number): Promise<Transaction> {
-    return fetch(BASE_URL + '/create-upload-txn', {
+    return fetch(this.baseUrl + '/upload/create-txn', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

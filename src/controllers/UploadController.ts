@@ -1,7 +1,8 @@
 import { type UploadTxnType } from 'src/components/MediaUploader/types';
 import { doNothing } from 'src/helpers';
 import UploadTransaction, { type FileType } from 'src/models/UploadTransaction';
-import UploadService, { type FileItem } from 'src/services/UploadService';
+import UploadService from 'src/services/UploadService';
+import { type FileItem } from 'src/services/types';
 
 type FileEntries = {
   [key: string]: File;

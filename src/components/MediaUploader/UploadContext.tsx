@@ -15,6 +15,7 @@ import type {
 } from './types';
 import React from 'react';
 import { doNothing } from 'src/helpers';
+import { BASE_URL } from 'src/constants';
 
 export const UploadContext = React.createContext<ProviderContext>({
   createUploadTxn: doNothing,
@@ -26,7 +27,7 @@ const UploadProvider = ({ children }: ProviderProps) => {
   const [transactions, updateTxn] = useState<UploadTxnType[]>([]);
 
   const uploadController = useMemo(
-    () => new UploadController(new UploadService()),
+    () => new UploadController(new UploadService(BASE_URL)),
     []
   );
 
