@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo -e "\n\
+======================================\n\
+          Running eslint              \n\
+======================================\n";
+npx eslint
+
+
+echo -e "\n\
+======================================\n\
+          Running tests               \n\
+======================================\n";
+npx vitest run tests
+
+exit 0

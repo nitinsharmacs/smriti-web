@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PROJECT_ROOT=$(git rev-parse --show-toplevel)
+COMMIT_MSG_FILE=$1
+CUSTOM_MSG_FILE=$PROJECT_ROOT/.githooks/commit-msg-template.txt
+FINAL_MSG_FILE="${COMMIT_MSG_FILE}.tmp"
+
+cat $CUSTOM_MSG_FILE >> $FINAL_MSG_FILE
+cat $COMMIT_MSG_FILE >> $FINAL_MSG_FILE
+
+mv $FINAL_MSG_FILE $COMMIT_MSG_FILE
+
