@@ -25,8 +25,9 @@ const UploadTxn = (props: UploadTxnProps) => {
   }, [props.txnId]);
 
   switch (props.status) {
-    case UploadTxnStatus.InProgress:
-      const progressState = props.state as InProgressStateType;
+    case UploadTxnStatus.InProgress: {
+      const progressState: InProgressStateType = props.state;
+
       return (
         <InProgressState
           achievedUploads={progressState.achievedUploads}
@@ -35,8 +36,9 @@ const UploadTxn = (props: UploadTxnProps) => {
           onStop={onStopHandler}
         />
       );
-    case UploadTxnStatus.Success:
-      const completedState = props.state as CompletedStateType;
+    }
+    case UploadTxnStatus.Success: {
+      const completedState: CompletedStateType = props.state;
 
       return (
         <CompleteState
@@ -46,8 +48,9 @@ const UploadTxn = (props: UploadTxnProps) => {
           onComplete={onCompleteHandler}
         />
       );
-    case UploadTxnStatus.Retry:
-      const retryState = props.state as RetryStateType;
+    }
+    case UploadTxnStatus.Retry: {
+      const retryState: RetryStateType = props.state;
       return (
         <>
           <RetryState
@@ -68,6 +71,7 @@ const UploadTxn = (props: UploadTxnProps) => {
           )}
         </>
       );
+    }
     default:
       return <></>;
   }

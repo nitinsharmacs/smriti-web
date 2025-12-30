@@ -118,7 +118,7 @@ describe('UploadService', () => {
     });
   });
   describe('uploadFiles', () => {
-    it('should start upload in interval', ({
+    it('should upload files and update progress in intervals', ({
       setIntervalMock,
       clearIntervalMock,
     }) => {
@@ -141,10 +141,11 @@ describe('UploadService', () => {
         onCompleteMock
       );
 
-      expect(FileUploader).toHaveBeenCalledExactlyOnceWith('txn_id', files);
+      expect(FileUploader).toHaveBeenCalledExactlyOnceWith('txn_id');
 
       expect(fileUploaderStartMock).toHaveBeenCalledExactlyOnceWith(
-        '/url' + '/upload/upload'
+        '/url' + '/upload/upload',
+        files
       );
 
       cb(); // call interval cb

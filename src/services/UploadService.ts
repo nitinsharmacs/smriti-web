@@ -17,9 +17,9 @@ class UploadService {
     onProgress: (progresses: ProgressStats) => void,
     onComplete: () => void
   ): () => void {
-    const upload = new FileUploader(txnId, files);
+    const upload = new FileUploader(txnId);
 
-    upload.start(this.baseUrl + '/upload/upload');
+    upload.start(this.baseUrl + '/upload/upload', files);
 
     this.interval = setInterval(() => {
       onProgress(upload.progresses);

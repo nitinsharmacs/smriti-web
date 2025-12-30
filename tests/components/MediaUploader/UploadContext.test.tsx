@@ -197,7 +197,6 @@ describe('UploadContext', () => {
               id: 'txn1-media-1',
               progress: 0,
             },
-            ,
             {
               name: 'hello2.txt',
               type: MediaType.Video,

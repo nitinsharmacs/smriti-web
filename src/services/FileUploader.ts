@@ -3,18 +3,19 @@ import type { FileItem } from './types';
 
 export default class FileUploader {
   private txnId: string;
-  private files: FileItem[];
+
   private req_map: { [key: string]: XMLHttpRequest } = {};
 
   private _progresses: ProgressStats = {};
 
-  constructor(txnId: string, files: FileItem[]) {
+  constructor(txnId: string) {
     this.txnId = txnId;
-    this.files = files;
   }
 
-  start(url: string) {
-    this.files.forEach((file) => {
+  start(url: string, files: FileItem[]) {
+    files.forEach((file) => {
+      this._progresses[file.id] = 0; // set progress
+
       const req = new XMLHttpRequest();
 
       const formData = new FormData();
@@ -45,7 +46,7 @@ export default class FileUploader {
   }
 
   finished(): boolean {
-    return Object.values(this._progresses).every((progress) => progress >= 100);
+    return Object.values(this.progresses).every((progress) => progress >= 100);
   }
 
   get progresses() {
