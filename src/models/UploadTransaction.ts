@@ -102,7 +102,7 @@ class UploadTransaction {
   complete(): boolean {
     if (this._status !== UploadTxnStatus.InProgress) return false;
 
-    if (this.txnState.achievedUploads === this.txnState.targetUploads) {
+    if (this.isCompleted()) {
       this.txnState = this.createCompleteState();
       this._status = UploadTxnStatus.Success;
       return true;
@@ -138,6 +138,10 @@ class UploadTransaction {
 
   anyFileUploaded(): boolean {
     return this.txnState.achievedUploads > 0;
+  }
+
+  isCompleted(): boolean {
+    return this.txnState.targetUploads === this.txnState.achievedUploads;
   }
 
   getObject(): UploadTxnType {

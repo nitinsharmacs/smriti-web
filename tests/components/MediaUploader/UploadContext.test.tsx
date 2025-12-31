@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   MediaType,
@@ -22,6 +22,8 @@ const stopUploadMock = vi.fn();
 const completeTxnPartiallyMock = vi.fn();
 const removeTransactionMock = vi.fn();
 const getFailedTxnMediaFilesMock = vi.fn();
+const commitTxnMock = vi.fn();
+
 const getTransactionsMock = vi.fn().mockReturnValue([
   {
     txnId: 'txn1',
@@ -64,6 +66,7 @@ vi.mock('src/controllers/UploadController', () => ({
     removeTransaction: removeTransactionMock,
     getFailedTxnMediaFiles: getFailedTxnMediaFilesMock,
     getTransactions: getTransactionsMock,
+    commitTransaction: commitTxnMock,
   })),
 }));
 
@@ -269,5 +272,96 @@ describe('UploadContext', () => {
     expect(
       await screen.findByText('Media getting uploaded')
     ).toBeInTheDocument();
+  });
+
+  it('should show complete media dialog', async ({ mockFileList }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Success,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 3,
+          previews: [
+            'txn1-media-1.png',
+            'txn1-media-2.png',
+            'txn1-media-3.png',
+          ],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    expect(await screen.findByText('Upload completed')).toBeInTheDocument();
+  });
+
+  it('should show partially complete media dialog', async ({
+    mockFileList,
+  }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Success,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 2,
+          previews: ['txn1-media-1.png', 'txn1-media-2.png'],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    expect(
+      await screen.findByText('Upload completed partially')
+    ).toBeInTheDocument();
+  });
+
+  it('should complete the uploaded media', async ({ mockFileList }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Success,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 3,
+          previews: [
+            'txn1-media-1.png',
+            'txn1-media-2.png',
+            'txn1-media-3.png',
+          ],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    const [completeBtn, ..._] = await screen.findAllByRole('button');
+
+    getTransactionsMock.mockReturnValueOnce([]);
+
+    await userEvent.click(completeBtn);
+
+    expect(commitTxnMock).toHaveBeenCalledExactlyOnceWith('txn1');
+    expect(screen.queryByText('Upload completed')).not.toBeInTheDocument();
   });
 });

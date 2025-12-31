@@ -170,4 +170,19 @@ describe('UploadService', () => {
       expect(clearIntervalMock).toHaveBeenCalledTimes(2);
     });
   });
+  describe('commitTransaction', () => {
+    it('should commit a transaction', async ({ fetchMock }) => {
+      const service = new UploadService('url');
+
+      await service.commitTransaction('txn1');
+
+      expect(fetchMock).toHaveBeenCalledExactlyOnceWith('url/upload/commit', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ txn_id: 'txn1' }),
+      });
+    });
+  });
 });

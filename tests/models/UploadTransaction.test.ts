@@ -493,4 +493,25 @@ describe('UploadTransaction', () => {
 
     expect(txn.getFailedMediaIds()).toStrictEqual([]);
   });
+
+  describe('isCompleted', () => {
+    it('should return true/false if transaction is non/completed', ({
+      mockFileList,
+    }) => {
+      const txnId = 'txn1';
+      const txn = new UploadTransaction(txnId, mockFileList.fileList);
+
+      expect(txn.isCompleted()).toBe(false);
+
+      const progresses = {
+        'txn1-media-1': 100,
+        'txn1-media-2': 100,
+        'txn1-media-3': 100,
+      };
+
+      txn.updateMediaProgresses(progresses);
+
+      expect(txn.isCompleted()).toBe(true);
+    });
+  });
 });

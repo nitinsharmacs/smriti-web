@@ -57,6 +57,16 @@ class UploadService {
         };
       });
   }
+
+  async commitTransaction(txnId: string): Promise<void> {
+    await fetch(this.baseUrl + '/upload/commit', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ txn_id: txnId }),
+    });
+  }
 }
 
 export default UploadService;

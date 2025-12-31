@@ -73,7 +73,7 @@ class UploadController {
 
     return txnId;
   }
-
+  // TODO: make stop async
   stopUpload(txnId: string): boolean {
     const entry = this.txnEntries[txnId];
 
@@ -102,6 +102,18 @@ class UploadController {
     return true;
   }
 
+  async commitTransaction(txnId: string): Promise<boolean> {
+    const { transaction } = this.txnEntries[txnId];
+
+    if (transaction.isCompleted()) {
+      await this.uploadService.commitTransaction(txnId);
+      this.removeTransaction(txnId);
+      return true;
+    }
+
+    return false;
+  }
+  // TODO: Make it private method
   removeTransaction(txnId: string): boolean {
     return delete this.txnEntries[txnId];
   }

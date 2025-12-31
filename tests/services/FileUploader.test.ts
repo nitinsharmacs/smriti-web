@@ -1,6 +1,3 @@
-/* eslint-disable no-empty-pattern */
-/* eslint-disable react-hooks/rules-of-hooks */
-
 import FileUploader from 'src/services/FileUploader';
 import {
   describe,

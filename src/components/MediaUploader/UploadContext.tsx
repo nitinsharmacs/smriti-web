@@ -48,8 +48,10 @@ const UploadProvider = ({ children }: ProviderProps) => {
     []
   );
 
-  const completeTxnHandler = useCallback<UploadTxnControl>((txnId) => {
-    console.log('complete transaction, ', txnId);
+  const completeTxnHandler = useCallback<UploadTxnControl>(async (txnId) => {
+    await uploadController.commitTransaction(txnId);
+
+    updateTransactions();
   }, []);
 
   const stopTxnHandler = useCallback<UploadTxnControl>((txnId) => {
