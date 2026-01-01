@@ -16,10 +16,14 @@ const getObjectMock = vi.fn();
 const updateMediaProgressesMock = vi.fn();
 const completeMock = vi.fn();
 const isCompletedMock = vi.fn();
+const isPartiallyCompletedMock = vi.fn();
+const retryMock = vi.fn();
 
 vi.mock('src/models/UploadTransaction', () => {
   return {
     default: vi.fn(() => {
+      isCompletedMock.mockReturnValue(false);
+      isPartiallyCompletedMock.mockReturnValue(false);
       return {
         stop: transactionStopMock,
         anyFileUploaded: anyFileUploadedMock,
@@ -29,6 +33,8 @@ vi.mock('src/models/UploadTransaction', () => {
         complete: completeMock,
         updateMediaProgresses: updateMediaProgressesMock,
         isCompleted: isCompletedMock,
+        isPartiallyCompleted: isPartiallyCompletedMock,
+        retry: retryMock,
       };
     }),
   };
@@ -324,7 +330,7 @@ describe('UploadController', () => {
 
       await controller.newUpload(mockFileList.fileList);
 
-      isCompletedMock.mockReturnValue(true);
+      isCompletedMock.mockReturnValueOnce(true);
 
       const removeTxnMock = vi.spyOn(controller, 'removeTransaction');
       const result = await controller.commitTransaction('txn1');
@@ -336,6 +342,25 @@ describe('UploadController', () => {
       expect(removeTxnMock).toHaveBeenCalledExactlyOnceWith('txn1');
     });
 
+    it('should commit a partially completed transaction', async ({
+      getController,
+      mockFileList,
+    }) => {
+      const { controller, serviceMock } = getController;
+
+      await controller.newUpload(mockFileList.fileList);
+
+      isPartiallyCompletedMock.mockReturnValueOnce(true);
+
+      const result = await controller.commitTransaction('txn1');
+
+      expect(result).toBe(true);
+      expect(
+        serviceMock.prototype.commitTransaction
+      ).toHaveBeenCalledExactlyOnceWith('txn1');
+      expect(retryMock).toHaveBeenCalledOnce();
+    });
+
     it('should not commit an in-progress transaction', async ({
       getController,
       mockFileList,
@@ -344,7 +369,6 @@ describe('UploadController', () => {
 
       await controller.newUpload(mockFileList.fileList);
 
-      isCompletedMock.mockReturnValue(false);
       const removeTxnMock = vi.spyOn(controller, 'removeTransaction');
 
       const result = await controller.commitTransaction('txn1');
@@ -352,6 +376,7 @@ describe('UploadController', () => {
       expect(result).toBe(false);
       expect(serviceMock.prototype.commitTransaction).not.toBeCalled();
       expect(removeTxnMock).not.toBeCalled();
+      expect(retryMock).not.toBeCalled();
     });
   });
 });

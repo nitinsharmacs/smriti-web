@@ -14,19 +14,19 @@ import { useCallback } from 'react';
 const UploadTxn = (props: UploadTxnProps) => {
   const onStopHandler = useCallback(() => {
     props.onStop(props.txnId);
-  }, [props.txnId]);
+  }, [props]);
 
   const onCompleteHandler = useCallback(() => {
     props.onComplete(props.txnId);
-  }, [props.txnId]);
+  }, [props]);
 
   const onRetryHandler = useCallback(() => {
     props.onRetry(props.txnId);
-  }, [props.txnId]);
+  }, [props]);
 
   switch (props.status) {
     case UploadTxnStatus.InProgress: {
-      const progressState: InProgressStateType = props.state;
+      const progressState = props.state as InProgressStateType;
 
       return (
         <InProgressState
@@ -38,7 +38,7 @@ const UploadTxn = (props: UploadTxnProps) => {
       );
     }
     case UploadTxnStatus.Success: {
-      const completedState: CompletedStateType = props.state;
+      const completedState = props.state as CompletedStateType;
 
       return (
         <CompleteState
@@ -50,7 +50,7 @@ const UploadTxn = (props: UploadTxnProps) => {
       );
     }
     case UploadTxnStatus.Retry: {
-      const retryState: RetryStateType = props.state;
+      const retryState = props.state as RetryStateType;
       return (
         <>
           <RetryState

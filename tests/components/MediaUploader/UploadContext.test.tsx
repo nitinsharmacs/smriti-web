@@ -364,4 +364,37 @@ describe('UploadContext', () => {
     expect(commitTxnMock).toHaveBeenCalledExactlyOnceWith('txn1');
     expect(screen.queryByText('Upload completed')).not.toBeInTheDocument();
   });
+
+  it('should complete a partially uploaded media', async ({ mockFileList }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Success,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 2,
+          previews: ['txn1-media-1.png', 'txn1-media-2.png'],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    const [completeBtn, ..._] = await screen.findAllByRole('button');
+
+    getTransactionsMock.mockReturnValueOnce([]);
+
+    await userEvent.click(completeBtn);
+
+    expect(commitTxnMock).toHaveBeenCalledExactlyOnceWith('txn1');
+    expect(
+      screen.queryByText('Upload completed partially')
+    ).not.toBeInTheDocument();
+  });
 });

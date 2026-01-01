@@ -370,14 +370,9 @@ describe('UploadTransaction', () => {
     const txnId = 'txn1';
     const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
-    txn.updateMediaProgresses({
-      'txn1-media-1': 100,
-      'txn1-media-2': 100,
-      'txn1-media-3': 90,
-    });
+    txn.stop();
 
     expect(txn.complete()).toBe(false);
-    expect(txn.status).toBe(UploadTxnStatus.InProgress);
   });
 
   it('should complete transaction partially', ({ mockFileList }) => {
@@ -494,10 +489,28 @@ describe('UploadTransaction', () => {
     expect(txn.getFailedMediaIds()).toStrictEqual([]);
   });
 
-  describe('isCompleted', () => {
-    it('should return true/false if transaction is non/completed', ({
+  describe('anyFileUploaded', () => {
+    it('should check if transaction has any file uploaded', ({
       mockFileList,
     }) => {
+      const txnId = 'txn1';
+      const txn = new UploadTransaction(txnId, mockFileList.fileList);
+
+      expect(txn.anyFileUploaded()).toBe(false);
+
+      const progresses = {
+        'txn1-media-1': 100,
+        'txn1-media-2': 0,
+        'txn1-media-3': 0,
+      };
+
+      txn.updateMediaProgresses(progresses);
+
+      expect(txn.anyFileUploaded()).toBe(true);
+    });
+  });
+  describe('isCompleted', () => {
+    it('should check if transaction is completed', ({ mockFileList }) => {
       const txnId = 'txn1';
       const txn = new UploadTransaction(txnId, mockFileList.fileList);
 
@@ -510,8 +523,77 @@ describe('UploadTransaction', () => {
       };
 
       txn.updateMediaProgresses(progresses);
+      txn.complete();
 
       expect(txn.isCompleted()).toBe(true);
+    });
+  });
+
+  describe('isPartiallyCompleted', () => {
+    it('should check if transaction partially completed', ({
+      mockFileList,
+    }) => {
+      const txnId = 'txn1';
+      const txn = new UploadTransaction(txnId, mockFileList.fileList);
+
+      expect(txn.isPartiallyCompleted()).toBe(false);
+
+      const progresses = {
+        'txn1-media-1': 100,
+        'txn1-media-2': 100,
+        'txn1-media-3': 50,
+      };
+
+      txn.updateMediaProgresses(progresses);
+      txn.stop();
+
+      expect(txn.isPartiallyCompleted()).toBe(true);
+    });
+  });
+
+  describe('retry', () => {
+    it('should set transaction state to pure retry state', ({
+      mockFileList,
+    }) => {
+      const txnId = 'txn1';
+      const txn = new UploadTransaction(txnId, mockFileList.fileList);
+
+      const retryState: RetryStateType = {
+        targetUploads: 1,
+        achievedUploads: 0,
+        mediaItems: [
+          {
+            name: 'hello3.png',
+            type: MediaType.Image,
+            status: MediaUploadStatus.Failed,
+            id: 'txn1-media-3',
+            progress: 50,
+          },
+        ],
+        previews: [],
+      };
+
+      const progresses = {
+        'txn1-media-1': 100,
+        'txn1-media-2': 100,
+        'txn1-media-3': 50,
+      };
+
+      txn.updateMediaProgresses(progresses);
+      txn.stop();
+
+      expect(txn.retry()).toBe(true);
+      expect(txn.state).toStrictEqual(retryState);
+      expect(txn.status).toBe(UploadTxnStatus.Retry);
+    });
+
+    it('should do nothing if transaction not in Retry state', ({
+      mockFileList,
+    }) => {
+      const txnId = 'txn1';
+      const txn = new UploadTransaction(txnId, mockFileList.fileList);
+
+      expect(txn.retry()).toBe(false);
     });
   });
 });

@@ -99,10 +99,29 @@ class UploadTransaction {
     return state.mediaItems.map((item) => item.id);
   }
 
+  // TODO: maybe think of a better name
+  retry(): boolean {
+    if (this._status !== UploadTxnStatus.Retry) return false;
+
+    const state = this.txnState as RetryStateType;
+
+    this.txnState = {
+      ...this.txnState,
+      targetUploads: state.targetUploads - state.achievedUploads,
+      achievedUploads: 0,
+      mediaItems: state.mediaItems.filter(
+        (item) => item.status === MediaUploadStatus.Failed
+      ),
+      previews: [],
+    };
+
+    return true;
+  }
+
   complete(): boolean {
     if (this._status !== UploadTxnStatus.InProgress) return false;
 
-    if (this.isCompleted()) {
+    if (this.txnState.targetUploads === this.txnState.achievedUploads) {
       this.txnState = this.createCompleteState();
       this._status = UploadTxnStatus.Success;
       return true;
@@ -141,7 +160,14 @@ class UploadTransaction {
   }
 
   isCompleted(): boolean {
-    return this.txnState.targetUploads === this.txnState.achievedUploads;
+    return this._status === UploadTxnStatus.Success;
+  }
+
+  isPartiallyCompleted(): boolean {
+    return (
+      this._status === UploadTxnStatus.Retry &&
+      this.state.achievedUploads < this.state.targetUploads
+    );
   }
 
   getObject(): UploadTxnType {

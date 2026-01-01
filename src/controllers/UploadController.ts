@@ -73,6 +73,7 @@ class UploadController {
 
     return txnId;
   }
+
   // TODO: make stop async
   stopUpload(txnId: string): boolean {
     const entry = this.txnEntries[txnId];
@@ -88,8 +89,6 @@ class UploadController {
 
   completeTxnPartially(txnId: string): boolean {
     const entry = this.txnEntries[txnId];
-
-    if (!entry) return false;
 
     const txn = entry.transaction;
 
@@ -108,6 +107,12 @@ class UploadController {
     if (transaction.isCompleted()) {
       await this.uploadService.commitTransaction(txnId);
       this.removeTransaction(txnId);
+      return true;
+    }
+
+    if (transaction.isPartiallyCompleted()) {
+      await this.uploadService.commitTransaction(txnId);
+      transaction.retry();
       return true;
     }
 
