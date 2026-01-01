@@ -9,6 +9,7 @@ const CompleteState = ({
   targetUploads,
   previews,
   onComplete,
+  onCancel,
 }: CompleteStateProps) => {
   return (
     <Modal>
@@ -26,6 +27,13 @@ const CompleteState = ({
           <div className='complete-controls'>
             <Button variant='contained' onClick={onComplete}>
               Complete
+            </Button>
+            <Button
+              variant='text'
+              onClick={onCancel}
+              style={{ marginLeft: '0.5em' }}
+            >
+              Cancel
             </Button>
           </div>
         </div>

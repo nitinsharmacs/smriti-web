@@ -41,6 +41,7 @@ vi.mock('src/models/UploadTransaction', () => {
 });
 
 import UploadTransaction from 'src/models/UploadTransaction';
+import { CancelOrigin } from 'src/components/MediaUploader/UploadTxn/types';
 
 const file1 = new File(['Hello world'], 'hello.txt', {
   type: 'text/plain',
@@ -64,6 +65,7 @@ const it = baseIt.extend<{
     serviceMock.prototype.createTransaction = vi.fn();
     serviceMock.prototype.uploadFiles = vi.fn();
     serviceMock.prototype.commitTransaction = vi.fn();
+    serviceMock.prototype.deleteTransaction = vi.fn();
 
     serviceMock.prototype.createTransaction.mockReturnValue({
       txnId: 'txn1',
@@ -226,10 +228,9 @@ describe('UploadController', () => {
 
       anyFileUploadedMock.mockReturnValue(false);
 
-      const removeTransactionMock = vi.spyOn(controller, 'removeTransaction');
       expect(controller.completeTxnPartially('txn1')).toBe(false);
       expect(completePartiallyMock).toBeCalledTimes(0);
-      expect(removeTransactionMock).toBeCalledTimes(1);
+      expect(controller.hasTransaction('txn1')).toBe(false);
     });
 
     it('should do nothing if txn entry missing for partial complete', async ({
@@ -242,17 +243,6 @@ describe('UploadController', () => {
 
       expect(controller.completeTxnPartially('txn1')).toBe(false);
       expect(completePartiallyMock).toBeCalledTimes(0);
-    });
-  });
-
-  describe('removeTransaction', () => {
-    it('should remove transaction', async ({ getController, mockFileList }) => {
-      const controller = getController.controller;
-
-      await controller.newUpload(mockFileList.fileList);
-
-      expect(controller.removeTransaction('txn1')).toBe(true);
-      expect(controller.hasTransaction('txn1')).toBe(false);
     });
   });
 
@@ -332,14 +322,13 @@ describe('UploadController', () => {
 
       isCompletedMock.mockReturnValueOnce(true);
 
-      const removeTxnMock = vi.spyOn(controller, 'removeTransaction');
       const result = await controller.commitTransaction('txn1');
 
       expect(result).toBe(true);
       expect(
         serviceMock.prototype.commitTransaction
       ).toHaveBeenCalledExactlyOnceWith('txn1');
-      expect(removeTxnMock).toHaveBeenCalledExactlyOnceWith('txn1');
+      expect(controller.hasTransaction('txn1')).toBe(false);
     });
 
     it('should commit a partially completed transaction', async ({
@@ -369,13 +358,82 @@ describe('UploadController', () => {
 
       await controller.newUpload(mockFileList.fileList);
 
-      const removeTxnMock = vi.spyOn(controller, 'removeTransaction');
-
       const result = await controller.commitTransaction('txn1');
 
       expect(result).toBe(false);
       expect(serviceMock.prototype.commitTransaction).not.toBeCalled();
-      expect(removeTxnMock).not.toBeCalled();
+      expect(controller.hasTransaction('txn1')).toBe(true);
+      expect(retryMock).not.toBeCalled();
+    });
+  });
+  describe('cancelTransaction', () => {
+    it('should cancel a completed txn', async ({
+      getController,
+      mockFileList,
+    }) => {
+      const { controller, serviceMock } = getController;
+
+      await controller.newUpload(mockFileList.fileList);
+
+      await controller.cancelTransaction('txn1');
+
+      expect(
+        serviceMock.prototype.deleteTransaction
+      ).toHaveBeenCalledExactlyOnceWith('txn1');
+      expect(controller.hasTransaction('txn1')).toBe(false);
+      expect(retryMock).not.toBeCalled();
+    });
+
+    it('should cancel a partially completed txn', async ({
+      getController,
+      mockFileList,
+    }) => {
+      const { controller, serviceMock } = getController;
+
+      await controller.newUpload(mockFileList.fileList);
+
+      await controller.cancelTransaction('txn1', CancelOrigin.RetryCompleted);
+
+      expect(
+        serviceMock.prototype.deleteTransaction
+      ).toHaveBeenCalledExactlyOnceWith('txn1');
+      expect(controller.hasTransaction('txn1')).toBe(true);
+      expect(retryMock).toBeCalled();
+    });
+
+    it('should cancel a retry txn with no partially completion', async ({
+      getController,
+      mockFileList,
+    }) => {
+      const { controller, serviceMock } = getController;
+
+      await controller.newUpload(mockFileList.fileList);
+
+      anyFileUploadedMock.mockReturnValueOnce(false);
+
+      await controller.cancelTransaction('txn1', CancelOrigin.Retry);
+
+      expect(
+        serviceMock.prototype.deleteTransaction
+      ).toHaveBeenCalledExactlyOnceWith('txn1');
+      expect(controller.hasTransaction('txn1')).toBe(false);
+      expect(retryMock).not.toBeCalled();
+    });
+
+    it('should cancel a retry txn with partially completion', async ({
+      getController,
+      mockFileList,
+    }) => {
+      const { controller, serviceMock } = getController;
+
+      await controller.newUpload(mockFileList.fileList);
+
+      anyFileUploadedMock.mockReturnValueOnce(true);
+
+      await controller.cancelTransaction('txn1', CancelOrigin.Retry);
+
+      expect(serviceMock.prototype.deleteTransaction).not.toBeCalled();
+      expect(controller.hasTransaction('txn1')).toBe(true);
       expect(retryMock).not.toBeCalled();
     });
   });

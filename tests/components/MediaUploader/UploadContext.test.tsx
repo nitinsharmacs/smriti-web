@@ -8,6 +8,7 @@ import {
 import UploadProvider, {
   createUploadTxn,
 } from 'src/components/MediaUploader/UploadContext';
+import { CancelOrigin } from 'src/components/MediaUploader/UploadTxn/types';
 import {
   describe,
   it as baseIt,
@@ -23,6 +24,7 @@ const completeTxnPartiallyMock = vi.fn();
 const removeTransactionMock = vi.fn();
 const getFailedTxnMediaFilesMock = vi.fn();
 const commitTxnMock = vi.fn();
+const cancelTxnMock = vi.fn();
 
 const getTransactionsMock = vi.fn().mockReturnValue([
   {
@@ -67,6 +69,7 @@ vi.mock('src/controllers/UploadController', () => ({
     getFailedTxnMediaFiles: getFailedTxnMediaFilesMock,
     getTransactions: getTransactionsMock,
     commitTransaction: commitTxnMock,
+    cancelTransaction: cancelTxnMock,
   })),
 }));
 
@@ -396,5 +399,340 @@ describe('UploadContext', () => {
     expect(
       screen.queryByText('Upload completed partially')
     ).not.toBeInTheDocument();
+  });
+
+  it('should cancel a completed upload', async ({ mockFileList }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Success,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 3,
+          previews: [
+            'txn1-media-1.png',
+            'txn1-media-2.png',
+            'txn1-media-3.png',
+          ],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    await waitFor(() =>
+      expect(screen.queryByText('Upload completed')).toBeInTheDocument()
+    );
+
+    const [_, cancelBtn] = await screen.findAllByRole('button');
+
+    getTransactionsMock.mockReturnValueOnce([]);
+
+    await userEvent.click(cancelBtn);
+
+    expect(cancelTxnMock).toHaveBeenCalledExactlyOnceWith(
+      'txn1',
+      CancelOrigin.Completed
+    );
+
+    await waitFor(() =>
+      expect(screen.queryByText('Upload completed')).not.toBeInTheDocument()
+    );
+  });
+
+  it('should cancel a partially completed upload', async ({ mockFileList }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Success,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 2,
+          previews: ['txn1-media-1.png', 'txn1-media-2.png'],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Upload completed partially')
+      ).toBeInTheDocument()
+    );
+
+    const [_, cancelBtn] = await screen.findAllByRole('button');
+
+    getTransactionsMock.mockReturnValueOnce([]);
+
+    await userEvent.click(cancelBtn);
+
+    expect(cancelTxnMock).toHaveBeenCalledExactlyOnceWith(
+      'txn1',
+      CancelOrigin.Completed
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Upload completed partially')
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it('should cancel a upload retry with no partial uploads', async ({
+    mockFileList,
+  }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Retry,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 0,
+          mediaItems: [
+            {
+              name: 'hello.txt',
+              type: MediaType.Video,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-1',
+              progress: 0,
+            },
+            {
+              name: 'hello2.txt',
+              type: MediaType.Video,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-2',
+              progress: 0,
+            },
+            {
+              name: 'hello3.png',
+              type: MediaType.Image,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-3',
+              progress: 20,
+            },
+          ],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    expect(
+      await screen.findByText('3 out of 3 uploads remaining')
+    ).toBeInTheDocument();
+
+    const [_, cancelBtn, ...__] = await screen.findAllByRole('button');
+
+    getTransactionsMock.mockReturnValueOnce([]);
+
+    await userEvent.click(cancelBtn);
+
+    expect(cancelTxnMock).toHaveBeenCalledExactlyOnceWith(
+      'txn1',
+      CancelOrigin.Retry
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('3 out of 3 uploads remaining')
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it('should cancel a upload retry with partial uploads', async ({
+    mockFileList,
+  }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Retry,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 1,
+          mediaItems: [
+            {
+              name: 'hello.txt',
+              type: MediaType.Video,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-1',
+              progress: 0,
+            },
+            {
+              name: 'hello2.txt',
+              type: MediaType.Video,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-2',
+              progress: 0,
+            },
+            {
+              name: 'hello3.png',
+              type: MediaType.Image,
+              status: MediaUploadStatus.Success,
+              id: 'txn1-media-3',
+              progress: 20,
+            },
+          ],
+          previews: ['preview'],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    expect(
+      await screen.findByText('2 out of 3 uploads remaining')
+    ).toBeInTheDocument();
+
+    const [_, cancelBtn, ...__] = await screen.findAllByRole('button');
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Success,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 1,
+          previews: ['preview'],
+        },
+      },
+    ]);
+
+    await userEvent.click(cancelBtn);
+
+    expect(cancelTxnMock).toHaveBeenCalledExactlyOnceWith(
+      'txn1',
+      CancelOrigin.Retry
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('2 out of 3 uploads remaining')
+      ).not.toBeInTheDocument()
+    );
+    expect(
+      await screen.findByText('Upload completed partially')
+    ).toBeInTheDocument();
+  });
+
+  it('should cancel a partial completed upload in retry', async ({
+    mockFileList,
+  }) => {
+    render(
+      <div>
+        <UploadProvider />
+      </div>
+    );
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Retry,
+        state: {
+          targetUploads: 3,
+          achievedUploads: 1,
+          mediaItems: [
+            {
+              name: 'hello.txt',
+              type: MediaType.Video,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-1',
+              progress: 0,
+            },
+            {
+              name: 'hello2.txt',
+              type: MediaType.Video,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-2',
+              progress: 0,
+            },
+            {
+              name: 'hello3.png',
+              type: MediaType.Image,
+              status: MediaUploadStatus.Success,
+              id: 'txn1-media-3',
+              progress: 20,
+            },
+          ],
+          previews: ['preview'],
+        },
+      },
+    ]);
+
+    createUploadTxn(mockFileList.fileList);
+
+    expect(
+      await screen.findByText('Upload completed partially')
+    ).toBeInTheDocument();
+
+    const [cancelBtn, ..._] = (await screen.findAllByRole('button')).reverse();
+
+    getTransactionsMock.mockReturnValueOnce([
+      {
+        txnId: 'txn1',
+        status: UploadTxnStatus.Retry,
+        state: {
+          targetUploads: 2,
+          achievedUploads: 0,
+          mediaItems: [
+            {
+              name: 'hello.txt',
+              type: MediaType.Video,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-1',
+              progress: 0,
+            },
+            {
+              name: 'hello2.txt',
+              type: MediaType.Video,
+              status: MediaUploadStatus.Failed,
+              id: 'txn1-media-2',
+              progress: 0,
+            },
+          ],
+          previews: [],
+        },
+      },
+    ]);
+
+    await userEvent.click(cancelBtn);
+
+    expect(cancelTxnMock).toHaveBeenCalledExactlyOnceWith(
+      'txn1',
+      CancelOrigin.RetryCompleted
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Upload completed partially')
+      ).not.toBeInTheDocument()
+    );
+    expect(
+      await screen.findByText('2 out of 2 uploads remaining')
+    ).toBeInTheDocument();
   });
 });

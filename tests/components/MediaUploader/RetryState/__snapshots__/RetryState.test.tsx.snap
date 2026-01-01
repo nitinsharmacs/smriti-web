@@ -37,6 +37,14 @@ exports[`RetryState > should render retry state 1`] = `
           tabindex="0"
           type="button"
         >
+          Cancel
+        </button>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary text-btn css-1uent87-MuiButtonBase-root-MuiButton-root"
+          style="margin-left: 0.5em;"
+          tabindex="0"
+          type="button"
+        >
           Show more
         </button>
       </div>

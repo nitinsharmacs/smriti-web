@@ -4,5 +4,6 @@ export interface RetryStateProps {
   achievedUploads: number;
   targetUploads: number;
   mediaItems: MediaItemType[];
-  onRetry?: () => void;
+  onRetry: () => void;
+  onCancel: () => void;
 }

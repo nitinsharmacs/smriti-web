@@ -67,6 +67,16 @@ class UploadService {
       body: JSON.stringify({ txn_id: txnId }),
     });
   }
+
+  async deleteTransaction(txnId: string): Promise<void> {
+    await fetch(this.baseUrl + '/upload/delete-txn', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ txn_id: txnId }),
+    });
+  }
 }
 
 export default UploadService;

@@ -1,4 +1,7 @@
-import type { UploadTxnProps } from 'src/components/MediaUploader/UploadTxn/types';
+import {
+  CancelOrigin,
+  type UploadTxnProps,
+} from 'src/components/MediaUploader/UploadTxn/types';
 import './styles.css';
 import InProgressState from 'src/components/MediaUploader/InProgressState/InProgressState';
 import CompleteState from 'src/components/MediaUploader/CompleteState/CompleteState';
@@ -46,6 +49,7 @@ const UploadTxn = (props: UploadTxnProps) => {
           targetUploads={completedState.targetUploads}
           previews={completedState.previews}
           onComplete={onCompleteHandler}
+          onCancel={() => props.onCancel(props.txnId, CancelOrigin.Completed)}
         />
       );
     }
@@ -58,6 +62,7 @@ const UploadTxn = (props: UploadTxnProps) => {
             targetUploads={retryState.targetUploads}
             mediaItems={retryState.mediaItems}
             onRetry={onRetryHandler}
+            onCancel={() => props.onCancel(props.txnId, CancelOrigin.Retry)}
           />
           {retryState.achievedUploads > 0 ? (
             <CompleteState
@@ -65,6 +70,9 @@ const UploadTxn = (props: UploadTxnProps) => {
               targetUploads={retryState.targetUploads}
               previews={retryState.previews}
               onComplete={onCompleteHandler}
+              onCancel={() =>
+                props.onCancel(props.txnId, CancelOrigin.RetryCompleted)
+              }
             />
           ) : (
             <></>

@@ -38,6 +38,14 @@ exports[`CompleteState > should render complete state 1`] = `
           >
             Complete
           </button>
+          <button
+            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary text-btn css-1uent87-MuiButtonBase-root-MuiButton-root"
+            style="margin-left: 0.5em;"
+            tabindex="0"
+            type="button"
+          >
+            Cancel
+          </button>
         </div>
       </div>
       <div
@@ -93,6 +101,14 @@ exports[`CompleteState > should render partially complete state 1`] = `
             type="button"
           >
             Complete
+          </button>
+          <button
+            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary text-btn css-1uent87-MuiButtonBase-root-MuiButton-root"
+            style="margin-left: 0.5em;"
+            tabindex="0"
+            type="button"
+          >
+            Cancel
           </button>
         </div>
       </div>

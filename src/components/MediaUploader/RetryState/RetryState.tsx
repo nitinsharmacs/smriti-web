@@ -23,6 +23,14 @@ const RetryState = (props: RetryStateProps) => {
           <Button key='retry-btn' variant='contained' onClick={props.onRetry}>
             Retry
           </Button>,
+          <Button
+            key='cancel-btn'
+            variant='text'
+            onClick={props.onCancel}
+            style={{ marginLeft: '0.5em' }}
+          >
+            Cancel
+          </Button>,
         ]}
       >
         <h4 className='retry-modal-heading'>

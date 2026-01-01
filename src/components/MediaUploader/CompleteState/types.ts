@@ -3,4 +3,5 @@ export interface CompleteStateProps {
   achievedUploads: number;
   previews: string[]; // thumbnails
   onComplete: () => void;
+  onCancel: () => void;
 }

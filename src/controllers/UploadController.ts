@@ -1,3 +1,4 @@
+import { CancelOrigin } from 'src/components/MediaUploader/UploadTxn/types';
 import { type UploadTxnType } from 'src/components/MediaUploader/types';
 import { doNothing } from 'src/helpers';
 import UploadTransaction, { type FileType } from 'src/models/UploadTransaction';
@@ -118,8 +119,30 @@ class UploadController {
 
     return false;
   }
-  // TODO: Make it private method
-  removeTransaction(txnId: string): boolean {
+
+  async cancelTransaction(
+    txnId: string,
+    origin: CancelOrigin = CancelOrigin.Completed
+  ): Promise<void> {
+    const { transaction } = this.txnEntries[txnId];
+
+    if (origin === CancelOrigin.Retry && transaction.anyFileUploaded()) {
+      transaction.completePartially();
+      return;
+    }
+
+    if (origin === CancelOrigin.RetryCompleted) {
+      transaction.retry();
+    }
+
+    if (origin === CancelOrigin.Completed || origin === CancelOrigin.Retry) {
+      this.removeTransaction(txnId);
+    }
+
+    await this.uploadService.deleteTransaction(txnId);
+  }
+
+  private removeTransaction(txnId: string): boolean {
     return delete this.txnEntries[txnId];
   }
 

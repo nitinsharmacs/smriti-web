@@ -5,12 +5,19 @@ import {
   MediaType,
   MediaUploadStatus,
 } from 'src/components/MediaUploader/types';
+import { doNothing } from 'src/helpers';
 import { describe, expect, it, vi } from 'vitest';
 
 describe('RetryState', () => {
   it('should render retry state', () => {
     const { container } = render(
-      <RetryState achievedUploads={0} targetUploads={0} mediaItems={[]} />
+      <RetryState
+        onRetry={doNothing}
+        onCancel={doNothing}
+        achievedUploads={0}
+        targetUploads={0}
+        mediaItems={[]}
+      />
     );
     expect(container).toMatchSnapshot();
   });
@@ -18,6 +25,8 @@ describe('RetryState', () => {
   it('should show more/less', async () => {
     render(
       <RetryState
+        onRetry={doNothing}
+        onCancel={doNothing}
         achievedUploads={0}
         targetUploads={2}
         mediaItems={[
@@ -39,7 +48,7 @@ describe('RetryState', () => {
       />
     );
 
-    const showMoreBtn = screen.getAllByRole('button')[1];
+    const showMoreBtn = screen.getAllByRole('button')[2];
 
     expect(screen.queryByText('image.png')).not.toBeInTheDocument();
     expect(screen.queryByText('video.mp4')).not.toBeInTheDocument();
@@ -60,6 +69,7 @@ describe('RetryState', () => {
       <RetryState
         achievedUploads={0}
         targetUploads={1}
+        onCancel={doNothing}
         mediaItems={[
           {
             id: '123',
@@ -78,5 +88,33 @@ describe('RetryState', () => {
     await userEvent.click(retryBtn);
 
     expect(retryMock).toHaveBeenCalledOnce();
+  });
+
+  it('should cancel retry', async () => {
+    const cancelMock = vi.fn();
+
+    render(
+      <RetryState
+        achievedUploads={0}
+        targetUploads={1}
+        onCancel={cancelMock}
+        mediaItems={[
+          {
+            id: '123',
+            type: MediaType.Image,
+            status: MediaUploadStatus.InProgress,
+            progress: 12,
+            name: 'image.png',
+          },
+        ]}
+        onRetry={doNothing}
+      />
+    );
+
+    const retryBtn = screen.getAllByRole('button')[1];
+
+    await userEvent.click(retryBtn);
+
+    expect(cancelMock).toHaveBeenCalledOnce();
   });
 });

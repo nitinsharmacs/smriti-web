@@ -70,6 +70,14 @@ const UploadProvider = ({ children }: ProviderProps) => {
     updateTransactions();
   }, []);
 
+  const cancelTxnHandler = useCallback<UploadTxnControl>(
+    async (txnId, origin) => {
+      await uploadController.cancelTransaction(txnId, origin);
+      updateTransactions();
+    },
+    []
+  );
+
   createUploadTxn = createUploadTxnHandler;
 
   return (
@@ -86,6 +94,7 @@ const UploadProvider = ({ children }: ProviderProps) => {
               onComplete={completeTxnHandler}
               onStop={stopTxnHandler}
               onRetry={retryTxnHandler}
+              onCancel={cancelTxnHandler}
             />
           ))}
         </UploadContainer>

@@ -185,4 +185,22 @@ describe('UploadService', () => {
       });
     });
   });
+  describe('deleteTransaction', () => {
+    it('should delete a transaction', async ({ fetchMock }) => {
+      const service = new UploadService('url');
+
+      await service.deleteTransaction('txn1');
+
+      expect(fetchMock).toHaveBeenCalledExactlyOnceWith(
+        'url/upload/delete-txn',
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ txn_id: 'txn1' }),
+        }
+      );
+    });
+  });
 });
